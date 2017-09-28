@@ -717,7 +717,7 @@ int main(void)
 	dname = "tmp/v2_data_test"+eventID;
     mkdir(dname.c_str(),S_IRWXU | S_IRWXG);
 
-    string name = dname+"/MD_" + toString(eventID) + ".dat";
+    string name = dname+"/MD_" + eventID + ".dat";
     fileout.open(name.c_str());
 
 	
