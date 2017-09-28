@@ -714,7 +714,7 @@ int main(void)
 	cin >> a; 
 	cin >> b; 
 
-	dname = "tmp/v2_data_test"+eventID;
+	dname = "/efs/v2_data_test"+eventID;
     mkdir(dname.c_str(),S_IRWXU | S_IRWXG);
 
     string name = dname+"/MD_" + eventID + ".dat";
