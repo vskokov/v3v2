@@ -751,9 +751,13 @@ int main(void)
     components(Omega_s, Omega_s_c);
     components(Omega_a, Omega_a_c);
 
+	cerr <<  "components done" << "\n";
+
 	begin = clock();
     for(int a=0; a<8; a++)
     {
+
+		cerr <<  "cycle " << a  << "\n";
         fftOmega_a_c.at(a).resize(Omega_a.shape());
         fftOmega_s_c.at(a).resize(Omega_a.shape());
 
