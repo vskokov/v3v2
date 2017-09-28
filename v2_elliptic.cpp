@@ -10,7 +10,7 @@ using namespace blitz;
 //choice of parameters g^2 \mu = 1
 
 const int size_x=512*2; // # steps in transverse direction
-const int N_Y=30; // # steps in long direction
+const int N_Y=100; // # steps in long direction
 
 const double L_x=31;// step_x*size_x; // transverse extent
 const double step_x=L_x/size_x; // transvers step size
@@ -694,7 +694,7 @@ public:
 int main(void)
 {
 	clock_t begin = clock();
-    blitz::Array<cd,2>  field(size_x,size_x); 
+    /*blitz::Array<cd,2>  field(size_x,size_x); 
     blitz::Array<cd,2>  fftOfField(size_x,size_x); 
     complex<double> *ptrField, *ptrFFT;
     fftw_plan plan; 
@@ -702,6 +702,7 @@ int main(void)
     ptrFFT = fftOfField.data();
     plan = fftw_plan_dft_2d(field.rows(),field.cols(),reinterpret_cast<fftw_complex*>(ptrField),reinterpret_cast<fftw_complex*>(ptrFFT),FFTW_FORWARD,FFTW_MEASURE);
     fftw_execute(plan);
+*/
 	clock_t end = clock();
 	
 	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
@@ -746,24 +747,35 @@ int main(void)
     Omega(Omega_s, Omega_a, V_c, A_a);
 	end = clock();
 	elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-    cerr << "omega done\n" << "time " << elapsed_secs << flush <<  endl;
+	
+   cerr << "omega done\n" << "time " << elapsed_secs << flush <<  endl;
+
+    output(0.0, V_c);
+	
+    V_c.free();
+    for (int a=0;a<8;a++) A_a.at(a).free(); 
+    cerr << "output done\n" << endl;
+
+ 
 
     components(Omega_s, Omega_s_c);
     components(Omega_a, Omega_a_c);
 
+    Omega_s.free();
+    Omega_a.free();
 	cerr <<  "components done" << "\n";
 
 	begin = clock();
     for(int a=0; a<8; a++)
     {
-
-		cerr <<  "cycle " << a  << "\n";
-        fftOmega_a_c.at(a).resize(Omega_a.shape());
-        fftOmega_s_c.at(a).resize(Omega_a.shape());
-
+	cerr <<  "cycle " << a  << "\n";
+        fftOmega_a_c.at(a).resize(size_x,size_x);
+        fftOmega_s_c.at(a).resize(size_x,size_x);
+	
         blitz::Array<cd,2> tmp1(size_x,size_x);
         blitz::Array<cd,2> tmp2(size_x,size_x);
-        tmp1 = Omega_a_c.at(a);
+        
+	tmp1 = Omega_a_c.at(a);
         FFTW(tmp1,tmp2);
         fftOmega_a_c.at(a)=tmp2*pow(step_x,2);
 
@@ -772,15 +784,15 @@ int main(void)
         fftOmega_s_c.at(a)=tmp2*pow(step_x,2);
 
         cerr << fftOmega_a_c.at(a)(0,0) << " " << fftOmega_s_c.at(a)(0,0) << "\n" << flush;
-    }
+    
+Omega_s_c.at(a).free();
+Omega_a_c.at(a).free();
+
+}
 	end = clock();
 
 	elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
     cerr << "components done\n" << "time " << elapsed_secs   << endl << flush;
-
-    output(0.0, V_c);
-
-    cerr << "output done\n" << endl;
 
     double Qs2= pow(Qs(0),2);
 
@@ -817,7 +829,7 @@ int main(void)
 	Bilin_interp myfunc(x,y,dNdp); 
 
 
-    double dK = 0.5;
+    double dK = 0.1;
 	int Nphi =128; 
     double dphi = 2.0*M_PI/Nphi;
 

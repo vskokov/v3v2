@@ -6,7 +6,7 @@ CFLAGS= -std=c++11 -O2 -lgsl -lgslcblas -lfftw3
 
 
 v2: 
-	g++  $(INCLUDES) $(LIBS) -O3 -o v2.x v2_elliptic.cpp zheevc3.c zheevv3.c   -lboost_system -lgsl -lgslcblas -lfftw3 -lm
+	g++  $(INCLUDES) $(LIBS) -O3 -o v2.x v2_elliptic.cpp zheevc3.c zheevv3.c   -lgsl -lgslcblas -lfftw3 -lm
 
 all05: 
 	g++  $(INCLUDES) $(LIBS) -O3 -o v3p05.x v3_mp_par.cpp zheevc3.c zheevv3.c -fopenmp  -lboost_system -lgsl -lgslcblas -lfftw3 -lm
