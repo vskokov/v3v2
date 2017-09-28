@@ -42,7 +42,7 @@ ofstream fileout;
 
 
 double a=0.5;
-double b=1.0/a; 
+double b=1.0/a;
 
 
 /*
@@ -66,13 +66,13 @@ double int_to_x(int i)
 
 double Qs(double Y)
 {
-	return 0.71; 
-	//Saturation momentum on Y
+    return 0.71;
+    //Saturation momentum on Y
     double a = 0.77190536;
     double b = 0.27141908;
     double c = -0.06149744;
-    
-	return a*exp(b*Y)+c;
+
+    return a*exp(b*Y)+c;
 }
 
 
@@ -94,11 +94,9 @@ void AdWilsonLine(colorAdArr& U, colorArr& V)
 {
     vector < TinyMatrix<cd,3,3>  > lambda = get_lambda();
     for(int a=0; a<8; a++)
-        for(int b=0; b<8; b++)
-        {
+        for(int b=0; b<8; b++) {
             for(int i=0; i<size_x; i++)
-                for(int j=0; j<size_x; j++)
-                {
+                for(int j=0; j<size_x; j++) {
                     colorMat Vx, Vxdagger, UnderTr;
                     Vx = V(i,j);
                     Vxdagger = dagger(Vx);
@@ -111,10 +109,8 @@ void AdWilsonLine(colorAdArr& U, colorArr& V)
 
 void rho_generator(blitz::Array<double,2>& rho)
 {
-    for(int i=0; i<size_x; i++)
-    {
-        for(int j=0; j<size_x; j++)
-        {
+    for(int i=0; i<size_x; i++) {
+        for(int j=0; j<size_x; j++) {
             rho(i,j) = Gaussian();
         }
     }
@@ -124,22 +120,20 @@ void rho_generator(blitz::Array<double,2>& rho)
 void rho_generator_p(blitz::Array<double,2>& rho)
 {
 
-	double xc = int_to_x(size_x/2); 
-	double yc = int_to_x(size_x/2);		
-	double R = 1.0/(g2mu/2.0);
-	
-	for(int i=0; i<size_x; i++)
-    {
-        for(int j=0; j<size_x; j++)
-        {
-			double x = int_to_x(i); 
-			double y = int_to_x(j);
+    double xc = int_to_x(size_x/2);
+    double yc = int_to_x(size_x/2);
+    double R = 1.0/(g2mu/2.0);
 
-			double ellipse = pow((x-xc)/(a*R),2)  + pow((y-yc)/(b*R),2) ;
+    for(int i=0; i<size_x; i++) {
+        for(int j=0; j<size_x; j++) {
+            double x = int_to_x(i);
+            double y = int_to_x(j);
 
-			rho(i,j) = 0; 
-			
-			if ( ellipse < 1.0 ) rho(i,j) = Gaussian_p();
+            double ellipse = pow((x-xc)/(a*R),2)  + pow((y-yc)/(b*R),2) ;
+
+            rho(i,j) = 0;
+
+            if ( ellipse < 1.0 ) rho(i,j) = Gaussian_p();
         }
     }
 }
@@ -178,8 +172,7 @@ TinyMatrix<cd,3,3> fV(int i, int j, vector<Array<double,2> >&  A_a)
     V_out=cd(1.0,0.0),cd(0.0,0.0),cd(0.0,0.0),
     cd(0.0,0.0),cd(1.0,0.0),cd(0.0,0.0),
     cd(0.0,0.0),cd(0.0,0.0),cd(1.0,0.0);
-    for(int ny=0; ny<N_Y; ny++)
-    {
+    for(int ny=0; ny<N_Y; ny++) {
 
         blitz::TinyMatrix<cd,3,3>  in_exp;
         blitz::TinyMatrix<cd,3,3>  V;
@@ -214,10 +207,8 @@ void IC_MV( colorArr& V )
 
 
 
-    for(int i=0; i<size_x; i=i+1)
-    {
-        for(int j=0; j<size_x; j=j+1)
-        {
+    for(int i=0; i<size_x; i=i+1) {
+        for(int j=0; j<size_x; j=j+1) {
 
             blitz::TinyMatrix<cd,3,3>  V_unit;
             V_unit=cd(1.0,0.0),cd(0.0,0.0),cd(0.0,0.0),
@@ -227,27 +218,25 @@ void IC_MV( colorArr& V )
         }
     }
 
-	for(int ny=0; ny<N_Y; ny++)
-    {
-    
-		cerr << "target slices" << ny << "\n"; 
+    for(int ny=0; ny<N_Y; ny++) {
 
-		vector<blitz::Array<double,2> >  A_a(8);
+        cerr << "target slices" << ny << "\n";
+
+        vector<blitz::Array<double,2> >  A_a(8);
 
 
-		for(int i=0; i<8; i++)
-		A_a.at(i).resize(size_x, size_x);
-		
-		for(int i=0; i<8; i++)
-        {
-			blitz::Array<double,2> rho_1(size_x, size_x);
-			rho_generator(rho_1);
+        for(int i=0; i<8; i++)
+            A_a.at(i).resize(size_x, size_x);
+
+        for(int i=0; i<8; i++) {
+            blitz::Array<double,2> rho_1(size_x, size_x);
+            rho_generator(rho_1);
 
             blitz::Array<cd,2>  image(size_x, size_x);
             blitz::Array<cd,2>  A(size_x, size_x);
             blitz::Array<cd,2>  tmp(size_x, size_x);
-            
-			blitz::Array<double,2>  B(size_x, size_x);
+
+            blitz::Array<double,2>  B(size_x, size_x);
             image=fft(rho_1);
 
             tmp=A_image(image);
@@ -257,10 +246,8 @@ void IC_MV( colorArr& V )
             A_a.at(i)=B;
         }
 
-		for(int i=0; i<size_x; i=i+1)
-        {
-            for(int j=0; j<size_x; j=j+1)
-            {
+        for(int i=0; i<size_x; i=i+1) {
+            for(int j=0; j<size_x; j=j+1) {
                 vector < TinyMatrix<cd,3,3>  > lambda = get_lambda();
 
 
@@ -295,8 +282,7 @@ void IC_p(  vector<blitz::Array<double,2> >& A_a )
 
     for(int i=0; i<8; i++) rho_generator_p(rho_a[i]);
 
-    for(int i=0; i<8; i++)
-    {
+    for(int i=0; i<8; i++) {
         blitz::Array<cd,2>  image(size_x, size_x);
         blitz::Array<cd,2>  A(size_x, size_x);
         blitz::Array<cd,2>  tmp(size_x, size_x);
@@ -363,18 +349,14 @@ void output(double Y,colorArr& V_c)
     vector<double> normal(max_k_int);
     double Qs_Y = Qs(Y);
 
-    for (int i=0; i<max_k; i++)
-    {
+    for (int i=0; i<max_k; i++) {
         distr.at(i) = 0.0;
         normal.at(i) = 0.0;
     }
 
-    for(int a=0; a<9; a++)
-    {
-        for(int i=0; i<size_x; i=i+1)
-        {
-            for(int j=0; j<size_x; j=j+1)
-            {
+    for(int a=0; a<9; a++) {
+        for(int i=0; i<size_x; i=i+1) {
+            for(int j=0; j<size_x; j=j+1) {
                 double x = int_to_x(i);
                 double y = int_to_x(j);
 
@@ -386,12 +368,10 @@ void output(double Y,colorArr& V_c)
 
         FFTW(comp, compFT);
 
-        for(int i=0; i<size_x; i=i+1)
-        {
+        for(int i=0; i<size_x; i=i+1) {
             double kx  = 2.0*M_PI*i/L_x;
             double kx_t  = 2.0/step_x*sin(kx*step_x/2.0);
-            for(int j=0; j<size_x; j=j+1)
-            {
+            for(int j=0; j<size_x; j=j+1) {
 
                 double ky  = 2.0*M_PI*j/L_x;
                 double kx_t  = 1.0/step_x*sin(kx*step_x);
@@ -440,39 +420,34 @@ void output(double Y,colorArr& V_c)
 
     FFTW_b(sum_all, pS);
 
-	double dr = (10.1*step_x); 
-	double N = int(L_x/dr); 
+    double dr = (10.1*step_x);
+    double N = int(L_x/dr);
 
-	vector<double> aS(N);
-	vector<double> aN(N);
+    vector<double> aS(N);
+    vector<double> aN(N);
 
-	for (int i=0; i<N; i++) 
-	{
-		aS[i]=0.0;
-		aN[i]=0.0;
-	}
+    for (int i=0; i<N; i++) {
+        aS[i]=0.0;
+        aN[i]=0.0;
+    }
 
-    for(int i=0; i<size_x; i++)
-    {
-        for(int j=0; j<size_x; j++)
-        {
+    for(int i=0; i<size_x; i++) {
+        for(int j=0; j<size_x; j++) {
             double r = sqrt(x2(int_to_x(i)) + x2(int_to_x(j)));
             int ir = int(r/dr);
-			if(ir<N)
-			{
-				aS[ir] += 1.0-real(pS (i,j))*0.5/3.0/size_x2/size_x2 ;  
-				aN[ir] += 1.0;
-			}
+            if(ir<N) {
+                aS[ir] += 1.0-real(pS (i,j))*0.5/3.0/size_x2/size_x2 ;
+                aN[ir] += 1.0;
+            }
             //fileout <<  sqrt(x2(int_to_x(i)) + x2(int_to_x(j)))  << " " << 1.0-real(pS (i,j))*0.5/3.0/size_x2/size_x2 << "\n" << flush;
         }
     }
 
 
-    for(int ir=0; ir<N; ir++)
-    {
+    for(int ir=0; ir<N; ir++) {
         double r = (double(ir)+0.5)*dr;
-        if (r<0.5*L_x) 
-			fileout <<  r  << " " << aS[ir]/aN[ir] << "\n" << flush;
+        if (r<0.5*L_x)
+            fileout <<  r  << " " << aS[ir]/aN[ir] << "\n" << flush;
     }
 
     //d_data<< real(pS(0,0)) << " " <<  real(pSPerp(0,0)) << "\n" <<  flush;
@@ -487,16 +462,14 @@ void Omega(colorArr& Omega_s, colorArr& Omega_a, colorArr V, vector<blitz::Array
     colorMat W_x, W_y;
 
     for(int i=0; i<size_x; i++)
-        for(int j=0; j<size_x; j++)
-        {
+        for(int j=0; j<size_x; j++) {
 
 
             Omega_s(i,j) = cd(0.0,0.0);
             Omega_a(i,j) = cd(0.0,0.0);
 
 
-            for(int a=0; a<8; a++)
-            {
+            for(int a=0; a<8; a++) {
                 //x component
                 double proton_part_x  =  0.5*(A_a.at(a)(index_x_boundary(i+1),j) - A_a.at(a)(index_x_boundary(i-1),j))/step_x;
                 W_x =  0.5/step_x*(Product( Product( dagger(V(index_x_boundary(i+1),j)),lambda.at(a) ),  V(index_x_boundary(i+1),j) )
@@ -526,8 +499,8 @@ double sign(double x)
 
 double SI(const int ik, const int jk, const vector<blitz::Array<cd,2> > &Omega_s, const vector<blitz::Array<cd,2> > & Omega_a)
 {
-	//cout << ik << " " << jk << "\n"; 
-	double kx  = 2.0*M_PI*ik/L_x;
+    //cout << ik << " " << jk << "\n";
+    double kx  = 2.0*M_PI*ik/L_x;
     double ky  = 2.0*M_PI*jk/L_x;
     double kx_t  = 1.0/step_x*sin(kx*step_x);
     double ky_t  = 1.0/step_x*sin(ky*step_x);
@@ -535,8 +508,7 @@ double SI(const int ik, const int jk, const vector<blitz::Array<cd,2> > &Omega_s
 
     cd sum = cd(0,0);
 
-    for(int a=0; a<8; a++)
-    {
+    for(int a=0; a<8; a++) {
         sum+=Omega_s.at(a)(ik,jk)*conj(Omega_s.at(a)(ik,jk)) + Omega_a.at(a)(ik,jk)*conj(Omega_a.at(a)(ik,jk));
     }
 
@@ -561,8 +533,7 @@ double AsSI_old(const int ik, const int jk, const vector<blitz::Array<cd,2> > &O
     cd Sum = cd(0.0,0.0);
 
     for(int i=0; i<size_x; i++)
-        for(int j=0; j<size_x; j++)
-        {
+        for(int j=0; j<size_x; j++) {
             {
                 Sum+=
                     Omega_s.at(0)(i,j)*Omega_s.at(0)(four_bound(ik-i),four_bound(jk-j));
@@ -579,8 +550,8 @@ double AsSI_old(const int ik, const int jk, const vector<blitz::Array<cd,2> > &O
 
 double AsSI(const int ik, const int jk, const vector<blitz::Array<cd,2> > &Omega_s, const vector<blitz::Array<cd,2> > & Omega_a)
 {
-	return 0;	
-	vector < TinyMatrix<double,8,8>  > F = get_F();
+    return 0;
+    vector < TinyMatrix<double,8,8>  > F = get_F();
     //blitz::Array<cd,2> UInt(size_x,size_x);
     //blitz::Array<cd,2> Integrated(size_x,size_x);
 
@@ -591,9 +562,8 @@ double AsSI(const int ik, const int jk, const vector<blitz::Array<cd,2> > &Omega
     double k2 = pow(2.0/step_x*sin(kx*step_x/2),2) +  pow(2.0/step_x*sin(ky*step_x/2),2);
 
     cd Integrate = cd(0.0,0.0);
-	for(int i=0; i<size_x; i++)
-        for(int j=0; j<size_x; j++)
-        {
+    for(int i=0; i<size_x; i++)
+        for(int j=0; j<size_x; j++) {
             double qx = 2.0*M_PI*i/L_x;
             double qy = 2.0*M_PI*j/L_x;
 
@@ -624,8 +594,7 @@ double AsSI(const int ik, const int jk, const vector<blitz::Array<cd,2> > &Omega
                 //if(q2>=pow(2*M_PI/L_x,2))
                 for(int a=0; a<8; a++)
                     for(int b=0; b<8; b++)
-                        for(int c=0; c<8; c++)
-                        {
+                        for(int c=0; c<8; c++) {
                             sum+=
                                 F.at(a)(b,c) *
                                 sign(kXq) /( (q2+UV)*(kminusq2+UV)) *
@@ -639,13 +608,13 @@ double AsSI(const int ik, const int jk, const vector<blitz::Array<cd,2> > &Omega
                         }
 
                 //UInt(i,j) = sum;
-				Integrate += sum; 
+                Integrate += sum;
             }
         }
 
 
-    
-	//FFTW_b(UInt, Integrated);
+
+    //FFTW_b(UInt, Integrated);
 
     //return real(Integrated(0,0))/pow(L_x,2);
     //return imag(Integrated(0,0))/pow(L_x,2);
@@ -656,13 +625,11 @@ double AsSI(const int ik, const int jk, const vector<blitz::Array<cd,2> > &Omega
 
 void components(colorArr& Omega, vector<blitz::Array<cd,2> > & Omega_comp)
 {
-    for(int a=0; a<8; a++)
-    {
+    for(int a=0; a<8; a++) {
         Omega_comp.at(a).resize(Omega.shape());
 
         for(int i=0; i<size_x; i++)
-            for(int j=0; j<size_x; j++)
-            {
+            for(int j=0; j<size_x; j++) {
                 Omega_comp.at(a)(i,j) = su3_group_element(Omega(i,j), a);
             }
     }
@@ -674,16 +641,19 @@ int sign(int i)
     return 1;
 }
 
-class ParallelStream{
+class ParallelStream
+{
     std::ostringstream stdStream;
 public:
-    ParallelStream(){}
+    ParallelStream() {}
     template <class T>
-    ParallelStream& operator<<(const T& inData){
+    ParallelStream& operator<<(const T& inData)
+    {
         stdStream << inData;
         return *this;
     }
-    std::string toString() const{
+    std::string toString() const
+    {
         return stdStream.str();
     }
 };
@@ -693,89 +663,88 @@ public:
 
 int main(void)
 {
-	clock_t begin = clock();
-    /*blitz::Array<cd,2>  field(size_x,size_x); 
-    blitz::Array<cd,2>  fftOfField(size_x,size_x); 
+    clock_t begin = clock();
+    /*blitz::Array<cd,2>  field(size_x,size_x);
+    blitz::Array<cd,2>  fftOfField(size_x,size_x);
     complex<double> *ptrField, *ptrFFT;
-    fftw_plan plan; 
-	ptrField = field.data();
+    fftw_plan plan;
+    ptrField = field.data();
     ptrFFT = fftOfField.data();
     plan = fftw_plan_dft_2d(field.rows(),field.cols(),reinterpret_cast<fftw_complex*>(ptrField),reinterpret_cast<fftw_complex*>(ptrFFT),FFTW_FORWARD,FFTW_MEASURE);
     fftw_execute(plan);
-*/
-	clock_t end = clock();
-	
-	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-	cerr << "measure \n" << "time " << elapsed_secs << flush  << endl;
+    */
+    clock_t end = clock();
+
+    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    cerr << "measure \n" << "time " << elapsed_secs << flush  << endl;
 
 
 
-	cin >> eventID;
-    
-	cin >> a; 
-	cin >> b; 
+    cin >> eventID;
 
-	dname = "/efs/v2_data_test"+eventID;
+    cin >> a;
+    cin >> b;
+
+    dname = "/efs/v2_data_test"+eventID;
     mkdir(dname.c_str(),S_IRWXU | S_IRWXG);
 
     string name = dname+"/MD_" + eventID + ".dat";
     fileout.open(name.c_str());
 
-	
-		//Target:
-	colorArr V_c(size_x,size_x);
-	begin = clock();
+
+    //Target:
+    colorArr V_c(size_x,size_x);
+    begin = clock();
     IC_MV(V_c);
-	end = clock();
-	elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-	cerr << "target done\n" << "time " << elapsed_secs << flush  << endl;
+    end = clock();
+    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    cerr << "target done\n" << "time " << elapsed_secs << flush  << endl;
 
     //Projectile:
     //
     vector<blitz::Array<double,2> > A_a(8);
-	begin = clock();
+    begin = clock();
     IC_p(A_a);
-	end = clock();
-	elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    end = clock();
+    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
     cerr << "projectile done\n" << "time " << elapsed_secs << flush  << endl;
 
-	begin = clock();
+    begin = clock();
     colorArr Omega_a(size_x,size_x), Omega_s(size_x,size_x);
     vector<blitz::Array<cd,2> > Omega_a_c(8), Omega_s_c(8);
     vector<blitz::Array<cd,2> > fftOmega_a_c(8), fftOmega_s_c(8);
 
     Omega(Omega_s, Omega_a, V_c, A_a);
-	end = clock();
-	elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-	
-   cerr << "omega done\n" << "time " << elapsed_secs << flush <<  endl;
+    end = clock();
+    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+
+    cerr << "omega done\n" << "time " << elapsed_secs << flush <<  endl;
 
     output(0.0, V_c);
-	
+
     V_c.free();
-    for (int a=0;a<8;a++) A_a.at(a).free(); 
+    for (int a=0; a<8; a++) A_a.at(a).free();
     cerr << "output done\n" << endl;
 
- 
+
 
     components(Omega_s, Omega_s_c);
     components(Omega_a, Omega_a_c);
 
     Omega_s.free();
     Omega_a.free();
-	cerr <<  "components done" << "\n";
+    cerr <<  "components done" << "\n";
 
-	begin = clock();
-    for(int a=0; a<8; a++)
-    {
-	cerr <<  "cycle " << a  << "\n";
+    begin = clock();
+    for(int a=0; a<8; a++) {
+        cerr <<  "cycle " << a  << "\n";
         fftOmega_a_c.at(a).resize(size_x,size_x);
         fftOmega_s_c.at(a).resize(size_x,size_x);
-	
+
         blitz::Array<cd,2> tmp1(size_x,size_x);
         blitz::Array<cd,2> tmp2(size_x,size_x);
-        
-	tmp1 = Omega_a_c.at(a);
+
+        tmp1 = Omega_a_c.at(a);
         FFTW(tmp1,tmp2);
         fftOmega_a_c.at(a)=tmp2*pow(step_x,2);
 
@@ -784,74 +753,70 @@ int main(void)
         fftOmega_s_c.at(a)=tmp2*pow(step_x,2);
 
         cerr << fftOmega_a_c.at(a)(0,0) << " " << fftOmega_s_c.at(a)(0,0) << "\n" << flush;
-    
-Omega_s_c.at(a).free();
-Omega_a_c.at(a).free();
 
-}
-	end = clock();
+        Omega_s_c.at(a).free();
+        Omega_a_c.at(a).free();
 
-	elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    }
+    end = clock();
+
+    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
     cerr << "components done\n" << "time " << elapsed_secs   << endl << flush;
 
     double Qs2= pow(Qs(0),2);
 
 
-	MatDoub dNdp (size_x/2+1, size_x/2+1); 
-	VecDoub x(size_x/2+1); 
-	VecDoub y(size_x/2+1); 
+    MatDoub dNdp (size_x/2+1, size_x/2+1);
+    VecDoub x(size_x/2+1);
+    VecDoub y(size_x/2+1);
 
-	for(int i=-size_x/4; i<size_x/4; i++)
-	{
-		double qx = 2.0*M_PI*four_bound(i)/L_x;
+    for(int i=-size_x/4; i<size_x/4; i++) {
+        double qx = 2.0*M_PI*four_bound(i)/L_x;
 
-		double qx_t  = 1.0/step_x*sin(qx*step_x);
+        double qx_t  = 1.0/step_x*sin(qx*step_x);
 
-		x[i+size_x/4] = qx_t; 
-		y[i+size_x/4] = qx_t; 
-		
-		//cerr << i << " " << four_bound(i) << " " << qx_t << "\n"; 
-		
-		begin = clock();
+        x[i+size_x/4] = qx_t;
+        y[i+size_x/4] = qx_t;
 
-		for(int j=-size_x/4; j<size_x/4; j++)
-		{
-         double qy = 2.0*M_PI*four_bound(j)/L_x;
-         double qy_t  = 1.0/step_x*sin(qy*step_x);
-		 
-		 dNdp[i+size_x/4][j+size_x/4] = 
-			SI(four_bound(i), four_bound(j), fftOmega_s_c, fftOmega_a_c);
-		 if (dNdp[i+size_x/4][j+size_x/4]<0) cerr<< i << " " <<  j  << " error \n"; 
-		}
-	
-	}
+        //cerr << i << " " << four_bound(i) << " " << qx_t << "\n";
 
-	Bilin_interp myfunc(x,y,dNdp); 
+        begin = clock();
+
+        for(int j=-size_x/4; j<size_x/4; j++) {
+            double qy = 2.0*M_PI*four_bound(j)/L_x;
+            double qy_t  = 1.0/step_x*sin(qy*step_x);
+
+            dNdp[i+size_x/4][j+size_x/4] =
+                SI(four_bound(i), four_bound(j), fftOmega_s_c, fftOmega_a_c);
+            if (dNdp[i+size_x/4][j+size_x/4]<0) cerr<< i << " " <<  j  << " error \n";
+        }
+
+    }
+
+    Bilin_interp myfunc(x,y,dNdp);
 
 
     double dK = 0.1;
-	int Nphi =128; 
+    int Nphi =128;
     double dphi = 2.0*M_PI/Nphi;
 
-    
-	begin = clock();
-    for(double K=dK; K<5+dK; K+=dK)
-    {
-        for(int iphi=0; iphi<Nphi; iphi+=1)
-        {
 
-			double phi = dphi*iphi; 
+    begin = clock();
+    for(double K=dK; K<5+dK; K+=dK) {
+        for(int iphi=0; iphi<Nphi; iphi+=1) {
+
+            double phi = dphi*iphi;
             double k_x = K*cos(phi);
             double k_y = K*sin(phi);
 
 
             double value_SI = myfunc.interp(k_x,k_y);
 
-			std::cout << (ParallelStream() << K << " " << phi << " " << value_SI << " " << 0 << "\n").toString() << flush;
+            std::cout << (ParallelStream() << K << " " << phi << " " << value_SI << " " << 0 << "\n").toString() << flush;
         }
-	}
-    
-	
+    }
+
+
 }
 
 
@@ -871,67 +836,66 @@ Omega_a_c.at(a).free();
 
 int main_old(void)
 {
-	clock_t begin = clock();
-    blitz::Array<cd,2>  field(size_x,size_x); 
-    blitz::Array<cd,2>  fftOfField(size_x,size_x); 
+    clock_t begin = clock();
+    blitz::Array<cd,2>  field(size_x,size_x);
+    blitz::Array<cd,2>  fftOfField(size_x,size_x);
     complex<double> *ptrField, *ptrFFT;
-    fftw_plan plan; 
-	ptrField = field.data();
+    fftw_plan plan;
+    ptrField = field.data();
     ptrFFT = fftOfField.data();
     plan = fftw_plan_dft_2d(field.rows(),field.cols(),reinterpret_cast<fftw_complex*>(ptrField),reinterpret_cast<fftw_complex*>(ptrFFT),FFTW_FORWARD,FFTW_MEASURE);
     fftw_execute(plan);
-	clock_t end = clock();
-	
-	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-	cerr << "measure \n" << "time " << elapsed_secs << flush  << endl;
+    clock_t end = clock();
+
+    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    cerr << "measure \n" << "time " << elapsed_secs << flush  << endl;
 
 
 
-	cin >> eventID;
-    
-	cin >> a; 
-	cin >> b; 
+    cin >> eventID;
 
-	dname = "v2_data_test"+eventID;
+    cin >> a;
+    cin >> b;
+
+    dname = "v2_data_test"+eventID;
     mkdir(dname.c_str(),S_IRWXU | S_IRWXG);
 
     string name = dname+"/MD_" + toString(eventID) + ".dat";
     fileout.open(name.c_str());
 
-	
-		//Target:
-	colorArr V_c(size_x,size_x);
-	begin = clock();
+
+    //Target:
+    colorArr V_c(size_x,size_x);
+    begin = clock();
     IC_MV(V_c);
-	end = clock();
-	elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-	cerr << "target done\n" << "time " << elapsed_secs << flush  << endl;
+    end = clock();
+    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    cerr << "target done\n" << "time " << elapsed_secs << flush  << endl;
 
     //Projectile:
     //
     vector<blitz::Array<double,2> > A_a(8);
-	begin = clock();
+    begin = clock();
     IC_p(A_a);
-	end = clock();
-	elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    end = clock();
+    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
     cerr << "projectile done\n" << "time " << elapsed_secs << flush  << endl;
 
-	begin = clock();
+    begin = clock();
     colorArr Omega_a(size_x,size_x), Omega_s(size_x,size_x);
     vector<blitz::Array<cd,2> > Omega_a_c(8), Omega_s_c(8);
     vector<blitz::Array<cd,2> > fftOmega_a_c(8), fftOmega_s_c(8);
 
     Omega(Omega_s, Omega_a, V_c, A_a);
-	end = clock();
-	elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    end = clock();
+    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
     cerr << "omega done\n" << "time " << elapsed_secs << flush <<  endl;
 
     components(Omega_s, Omega_s_c);
     components(Omega_a, Omega_a_c);
 
-	begin = clock();
-    for(int a=0; a<8; a++)
-    {
+    begin = clock();
+    for(int a=0; a<8; a++) {
         fftOmega_a_c.at(a).resize(Omega_a.shape());
         fftOmega_s_c.at(a).resize(Omega_a.shape());
 
@@ -947,9 +911,9 @@ int main_old(void)
 
         cerr << fftOmega_a_c.at(a)(0,0) << " " << fftOmega_s_c.at(a)(0,0) << "\n" << flush;
     }
-	end = clock();
+    end = clock();
 
-	elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
     cerr << "components done\n" << "time " << elapsed_secs   << endl << flush;
 
     output(0.0, V_c);
@@ -960,32 +924,30 @@ int main_old(void)
 
 
     double dK = 0.5;
-	int Nphi =128; 
+    int Nphi =128;
     double dphi = 2.0*M_PI/Nphi;
 
-	begin = clock();
-    for(double K=dK; K<5+dK; K+=dK)
-    {
-		int iphi; 
-		double value_SI;
-		double value_ASI;
-		double phi, k_x, k_y, lat_k_x, lat_k_y;
-		int int_k_x, int_k_y, sx, sy;
-		double k_x_m, k_y_m, k_x_m_shift, k_y_m_shift, t, u; 
+    begin = clock();
+    for(double K=dK; K<5+dK; K+=dK) {
+        int iphi;
+        double value_SI;
+        double value_ASI;
+        double phi, k_x, k_y, lat_k_x, lat_k_y;
+        int int_k_x, int_k_y, sx, sy;
+        double k_x_m, k_y_m, k_x_m_shift, k_y_m_shift, t, u;
 
-		double SI_1m_1m,  SI_0_1m, SI_1m_0, SI_0_0;    
-		double ASI_1m_1m,  ASI_0_1m, ASI_1m_0, ASI_0_0;  
+        double SI_1m_1m,  SI_0_1m, SI_1m_0, SI_0_0;
+        double ASI_1m_1m,  ASI_0_1m, ASI_1m_0, ASI_0_0;
 
-		#pragma  omp parallel for  shared(K,dphi,Nphi,dK,fftOmega_s_c,fftOmega_a_c,iphi) private(\
-		phi, k_x, k_y, lat_k_x, lat_k_y, int_k_x, int_k_y, sx, sy, k_x_m, k_y_m, k_x_m_shift, k_y_m_shift, t, u,SI_1m_1m,  SI_0_1m,\
-		SI_1m_0, SI_0_0,ASI_1m_1m,  ASI_0_1m, ASI_1m_0, ASI_0_0,value_SI,value_ASI)
-        for(iphi=0; iphi<Nphi; iphi+=1)
-        {
-			
+        #pragma  omp parallel for  shared(K,dphi,Nphi,dK,fftOmega_s_c,fftOmega_a_c,iphi) private(\
+        phi, k_x, k_y, lat_k_x, lat_k_y, int_k_x, int_k_y, sx, sy, k_x_m, k_y_m, k_x_m_shift, k_y_m_shift, t, u,SI_1m_1m,  SI_0_1m,\
+        SI_1m_0, SI_0_0,ASI_1m_1m,  ASI_0_1m, ASI_1m_0, ASI_0_0,value_SI,value_ASI)
+        for(iphi=0; iphi<Nphi; iphi+=1) {
 
 
-			phi = dphi*iphi; 
-            k_x = K*cos(phi);
+
+        phi = dphi*iphi;
+        k_x = K*cos(phi);
             k_y = K*sin(phi);
 
             lat_k_x = 1.0/step_x*asin(k_x*step_x);
@@ -1006,44 +968,44 @@ int main_old(void)
             t = (k_x - k_x_m)/(k_x_m_shift - k_x_m);
             u = (k_y - k_y_m)/(k_y_m_shift - k_y_m);
 
-			//std::cerr << k_x << " " << k_x_m << " " << k_x_m_shift << "\n" << flush;
+            //std::cerr << k_x << " " << k_x_m << " " << k_x_m_shift << "\n" << flush;
 
-			{
-			SI_1m_1m = SI(four_bound(int_k_x), four_bound(int_k_y), fftOmega_s_c, fftOmega_a_c);
-			ASI_1m_1m = AsSI(four_bound(int_k_x), four_bound(int_k_y), fftOmega_s_c, fftOmega_a_c);
-			}
+            {
+                SI_1m_1m = SI(four_bound(int_k_x), four_bound(int_k_y), fftOmega_s_c, fftOmega_a_c);
+                ASI_1m_1m = AsSI(four_bound(int_k_x), four_bound(int_k_y), fftOmega_s_c, fftOmega_a_c);
+            }
 
-			{
-			SI_0_1m = SI(four_bound(int_k_x+sx), four_bound(int_k_y), fftOmega_s_c, fftOmega_a_c);
-			ASI_0_1m = AsSI(four_bound(int_k_x+sx), four_bound(int_k_y), fftOmega_s_c, fftOmega_a_c);
-			}
+            {
+                SI_0_1m = SI(four_bound(int_k_x+sx), four_bound(int_k_y), fftOmega_s_c, fftOmega_a_c);
+                ASI_0_1m = AsSI(four_bound(int_k_x+sx), four_bound(int_k_y), fftOmega_s_c, fftOmega_a_c);
+            }
 
-			{
-			SI_1m_0 = SI(four_bound(int_k_x), four_bound(int_k_y+sy), fftOmega_s_c, fftOmega_a_c);
-			ASI_1m_0 = AsSI(four_bound(int_k_x), four_bound(int_k_y+sy), fftOmega_s_c, fftOmega_a_c);
-			}
+            {
+                SI_1m_0 = SI(four_bound(int_k_x), four_bound(int_k_y+sy), fftOmega_s_c, fftOmega_a_c);
+                ASI_1m_0 = AsSI(four_bound(int_k_x), four_bound(int_k_y+sy), fftOmega_s_c, fftOmega_a_c);
+            }
 
-			{
-			SI_0_0 = SI(four_bound(int_k_x+sx), four_bound(int_k_y+sy), fftOmega_s_c, fftOmega_a_c);
-			ASI_0_0 = AsSI(four_bound(int_k_x+sx), four_bound(int_k_y+sy), fftOmega_s_c, fftOmega_a_c);
-			}
+            {
+                SI_0_0 = SI(four_bound(int_k_x+sx), four_bound(int_k_y+sy), fftOmega_s_c, fftOmega_a_c);
+                ASI_0_0 = AsSI(four_bound(int_k_x+sx), four_bound(int_k_y+sy), fftOmega_s_c, fftOmega_a_c);
+            }
 
             value_SI = (1-t)*(1-u) * SI_1m_1m
-                              + t*(1-u) * SI_0_1m
-                              + (1-t)*u * SI_1m_0
-                              + t*u * SI_0_0;
+                       + t*(1-u) * SI_0_1m
+                       + (1-t)*u * SI_1m_0
+                       + t*u * SI_0_0;
 
             value_ASI = (1-t)*(1-u) * ASI_1m_1m
-                              + t*(1-u) * ASI_0_1m
-                              + (1-t)*u * ASI_1m_0
-                              + t*u * ASI_0_0;
+                        + t*(1-u) * ASI_0_1m
+                        + (1-t)*u * ASI_1m_0
+                        + t*u * ASI_0_0;
 
-			std::cout << (ParallelStream() << K << " " << phi << " " << value_SI << " " << value_ASI << "\n").toString() << flush;
+            std::cout << (ParallelStream() << K << " " << phi << " " << value_SI << " " << value_ASI << "\n").toString() << flush;
         }
-	}
-    
-	end = clock();
-	elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    }
+
+    end = clock();
+    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
     cerr << "done\n" << "time " << elapsed_secs   << endl << flush;
-	}
+}
 
