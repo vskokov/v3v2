@@ -12,7 +12,7 @@ using namespace blitz;
 const int size_x=512*2; // # steps in transverse direction
 const int N_Y=100; // # steps in long direction
 
-const double L_x=31;// step_x*size_x; // transverse extent
+const double L_x=32;// step_x*size_x; // transverse extent
 const double step_x=L_x/size_x; // transvers step size
 
 
@@ -593,8 +593,8 @@ void outHBT(double A, double B, const colorArr& V_c)
 
     cerr << "FFT components done\n" << "time " << elapsed_secs   << endl << flush;
 
-	double dK = 0.1;
-	double DK = 0.1;
+	double dK = step_x*4;
+	double DK = step_x*4;
 	double Kmax = 5+DK;
 
 	for(double K=DK;K<Kmax;K+=DK)
