@@ -593,7 +593,7 @@ void outHBT(double A, double B, const colorArr& V_c)
 
     cerr << "FFT components done\n" << "time " << elapsed_secs   << endl << flush;
 
-	double dK = 0.05;
+	double dK = 0.1;
 	double DK = 0.1;
 	double Kmax = 5+DK;
 
