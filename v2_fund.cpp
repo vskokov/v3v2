@@ -35,10 +35,6 @@ typedef Array<colorAdMat,2>  colorAdArr;
 ofstream fileout;
 
 
-double aE=0.5;
-double bE=1.0/aE;
-
-
 /*
 AdComp DecomposeAdMatrix(colorAdMat U)
 {
@@ -553,41 +549,12 @@ double int_to_k2(int i, int j)
 }
 
 
-int main(void)
+
+void outHBT(double A, double B, const colorArr& V_c)
 {
-    clock_t begin = clock();
-    clock_t end = clock();
-    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-
-    cin >> eventID;
-    cin >> aE;
-    cin >> bE;
-
-    //dname = "/efs/v2_fund"+eventID;
-    //mkdir(dname.c_str(),S_IRWXU | S_IRWXG);
-
-    //string name = dname+"/MD_" + eventID + ".dat";
-    //fileout.open(name.c_str());
-
-    //Target:
-    begin = clock();
-    colorArr V_c(size_x,size_x);
-    IC_MV(V_c);
-    end = clock();
-    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-    cerr << "target done\n" << "time " << elapsed_secs << flush  << endl;
-
-	//output(0.0, V_c);
-	cerr << "output done\n" << endl;
-
+	clock_t begin = clock();
     vector<blitz::Array<cd,2> > fftV_c_c(9);
 
-
-    //components(V_c, V_c_c);
-	//cerr << "componets done\n" << endl;
-
-    
-	begin = clock();
     for(int a=0; a<9; a++) {
         cerr <<  "cycle " << a  << "\n";
         fftV_c_c.at(a).resize(size_x,size_x);
@@ -605,7 +572,7 @@ int main(void)
         	double y_c = int_to_x(size_x/2); 
 			double R = 5.0; 
                 tmp1(i,j) = su3_group_element(V_c(i,j), a) 
-					* exp(- pow((x-x_c)/R/aE,2) - pow((y-y_c)/R/bE,2)) ;
+					* exp(- pow((x-x_c)/R/A,2) - pow((y-y_c)/R/B,2)) ;
             }
         }
 
@@ -620,53 +587,15 @@ int main(void)
 
     }
 
-    V_c.free();
-    end = clock();
+    clock_t end = clock();
 
-    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+
     cerr << "FFT components done\n" << "time " << elapsed_secs   << endl << flush;
 
-    double Qs2= pow(Qs(0),2);
-
-	double dK = 0.1;
+	double dK = 0.05;
 	double DK = 0.1;
 	double Kmax = 5+DK;
-
-/*
-	for(double K=DK;K<Kmax;K+=DK)
-	{
-	cerr<< "K=" <<K << endl;
-    for(int i1=0; i1<size_x; i1=i1+1) {
-      double kx1_t  = int_to_k(i1);
-      for(int j1=0; j1<size_x; j1=j1+1) {
-	
-                double ky1_t  = int_to_k(j1);
-                double k12 = int_to_k2(i1,j1); 
-	
-				if( ((sqrt(k12)-(K-0.5*dK)) * (sqrt(k12)-(K+0.5*dK)) <0.0 
-	  ) 
-		//	&& ((j1<size_x/4) || ((j1-3*size_x/4)*(j1-size_x/2)<0)) 
-		//	&& ((i1<size_x/4) || ((i1-3*size_x/4)*(i1-size_x/2)<0)) 
-			) 
-	{
-			double phi_1 = atan2(ky1_t,kx1_t); 	
-
-			cout << K <<" "; 
-			//cout << delta_phi <<" "; 
-			cout << phi_1 <<" "; 
-			cout << sqrt(k12)*real(Dipole(i1,j1,fftV_c_c)) <<" "; 
-			cout << kx1_t << " "; 
-			cout << ky1_t << " "; 
-			cout << sqrt(k12) << " "; 
-			cout << endl; 
-
-	
-	}}}}
-
-return 0;
-*/
-
-
 
 	for(double K=DK;K<Kmax;K+=DK)
 	{
@@ -680,6 +609,7 @@ return 0;
 	double vD2_2 = 0.0; 
 	double vD3_2 = 0.0; 
 
+	int N=0;
 
 	//cerr<< "K=" <<K << endl;
     for(int i1=0; i1<size_x; i1=i1+1) {
@@ -716,7 +646,7 @@ return 0;
 			double cross_product = kx1_t*ky2_t-ky1_t*kx2_t; 
 			double delta_phi = atan2(cross_product,scalar_product); 
 
-			if(delta_phi<0) delta_phi=delta_phi+2*M_PI; 
+			//if(delta_phi<0) delta_phi=delta_phi+2*M_PI; 
 			
 
 
@@ -733,7 +663,7 @@ return 0;
 			vD2_2 += D*cos(2*delta_phi);  
 			vD3_2 += D*cos(3*delta_phi);  
 
-
+			N++;
 			/*int phi = delta_phi * 100; 
 			delta_phi = phi / 100.0;
 
@@ -759,11 +689,47 @@ return 0;
 	
 	}}
 	
-	cout << K 
-		<< " " << sqrt(0.5*v2_2/v0_2) << " " << sqrt(0.5*v3_2/v0_2)
-		<< " " << sqrt(0.5*vD2_2/v0_2) << " " << sqrt(0.5*vD3_2/v0_2)
-		<< " " << sqrt(0.5*vQ2_2/v0_2) << " " << sqrt(0.5*vQ3_2/v0_2)
+	if(v0_2>0) cout 
+		<< A << " " << B << " " 
+		<< K 
+		<< " " << (v2_2/v0_2) 
+		//<< " " << (v3_2/v0_2)
+		<< " " << (vD2_2/v0_2) 
+		//<< " " << (vD3_2/v0_2)
+		<< " " << (vQ2_2/v0_2) 
+		<< " " << (v0_2/N) 
+		//<< " " << (vQ3_2/v0_2)
 		<< endl; 
 	}
+
+
+}
+
+
+
+int main(void)
+{
+    clock_t begin = clock();
+    clock_t end = clock();
+    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+
+    cin >> eventID;
+
+    //Target:
+    begin = clock();
+    colorArr V_c(size_x,size_x);
+    IC_MV(V_c);
+    end = clock();
+    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    cerr << "target done\n" << "time " << elapsed_secs << flush  << endl;
+
+	outHBT(1.0, 1.0, V_c);
+    cerr << " one " << endl;
+	outHBT(2.0, 0.5, V_c); 
+    cerr << " two " << endl;
+	outHBT(0.5, 2.0, V_c); 
+    cerr << " three " << endl;
+	outHBT(3.0, 3.0, V_c); 
+    cerr << " four " << endl;
 
 }
