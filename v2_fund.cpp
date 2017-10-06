@@ -12,7 +12,7 @@ using namespace blitz;
 const int size_x=512*2; // # steps in transverse direction
 const int N_Y=100; // # steps in long direction
 
-const double L_x=32;// step_x*size_x; // transverse extent
+const double L_x=32*2;// step_x*size_x; // transverse extent
 const double step_x=L_x/size_x; // transvers step size
 
 
@@ -85,9 +85,11 @@ void AdWilsonLine(colorAdArr& U, colorArr& V)
     vector < TinyMatrix<cd,3,3>  > lambda = get_lambda();
 
     for(int a=0; a<8; a++)
-        for(int b=0; b<8; b++) {
+        for(int b=0; b<8; b++)
+        {
             for(int i=0; i<size_x; i++)
-                for(int j=0; j<size_x; j++) {
+                for(int j=0; j<size_x; j++)
+                {
                     colorMat Vx, Vxdagger, UnderTr;
                     Vx = V(i,j);
                     Vxdagger = dagger(Vx);
@@ -100,8 +102,10 @@ void AdWilsonLine(colorAdArr& U, colorArr& V)
 
 void rho_generator(blitz::Array<double,2>& rho)
 {
-    for(int i=0; i<size_x; i++) {
-        for(int j=0; j<size_x; j++) {
+    for(int i=0; i<size_x; i++)
+    {
+        for(int j=0; j<size_x; j++)
+        {
             rho(i,j) = Gaussian();
         }
     }
@@ -127,8 +131,14 @@ int index_x_boundary(int in)
 {
     //periodic boundaries
     int i = in;
-    if(i<0) i = i + size_x;
-    if(i>size_x-1) i = i - size_x;
+    if(i<0)
+    {
+        i = i + size_x;
+    }
+    if(i>size_x-1)
+    {
+        i = i - size_x;
+    }
     return i;
 }
 
@@ -142,7 +152,8 @@ TinyMatrix<cd,3,3> fV(int i, int j, vector<Array<double,2> >&  A_a)
     V_out=cd(1.0,0.0),cd(0.0,0.0),cd(0.0,0.0),
     cd(0.0,0.0),cd(1.0,0.0),cd(0.0,0.0),
     cd(0.0,0.0),cd(0.0,0.0),cd(1.0,0.0);
-    for(int ny=0; ny<N_Y; ny++) {
+    for(int ny=0; ny<N_Y; ny++)
+    {
 
         blitz::TinyMatrix<cd,3,3>  in_exp;
         blitz::TinyMatrix<cd,3,3>  V;
@@ -150,7 +161,9 @@ TinyMatrix<cd,3,3> fV(int i, int j, vector<Array<double,2> >&  A_a)
         in_exp=cd(0.0,0.0);
 
         for(int a=0; a<8; a++)
+        {
             in_exp = in_exp + lambda.at(a) * A_a.at(ny*8+a)(i,j);
+        }
         in_exp=in_exp; // times i in the matrixix exponent
         V = matrix_exp_an_antiH(in_exp);
         V_out=Product(V,V_out);
@@ -173,20 +186,23 @@ blitz::Array<complex<double>,2> fft(blitz::Array<double,2>& rho)
 
 void IC_MV( colorArr& V )
 {
-            blitz::TinyMatrix<cd,3,3>  V_unit;
-            V_unit=cd(1.0,0.0),cd(0.0,0.0),cd(0.0,0.0),
-            cd(0.0,0.0),cd(1.0,0.0),cd(0.0,0.0),
-            cd(0.0,0.0),cd(0.0,0.0),cd(1.0,0.0);
+    blitz::TinyMatrix<cd,3,3>  V_unit;
+    V_unit=cd(1.0,0.0),cd(0.0,0.0),cd(0.0,0.0),
+    cd(0.0,0.0),cd(1.0,0.0),cd(0.0,0.0),
+    cd(0.0,0.0),cd(0.0,0.0),cd(1.0,0.0);
 
-			for(int i=0; i<size_x; i=i+1) {
-        for(int j=0; j<size_x; j=j+1) {
+    for(int i=0; i<size_x; i=i+1)
+    {
+        for(int j=0; j<size_x; j=j+1)
+        {
 
 
             V(i,j)=V_unit;
         }
     }
 
-    for(int ny=0; ny<N_Y; ny++) {
+    for(int ny=0; ny<N_Y; ny++)
+    {
 
         cerr << "target slices" << ny << "\n";
 
@@ -194,9 +210,12 @@ void IC_MV( colorArr& V )
 
 
         for(int i=0; i<8; i++)
+        {
             A_a.at(i).resize(size_x, size_x);
+        }
 
-        for(int i=0; i<8; i++) {
+        for(int i=0; i<8; i++)
+        {
             blitz::Array<double,2> rho_1(size_x, size_x);
             rho_generator(rho_1);
 
@@ -214,8 +233,10 @@ void IC_MV( colorArr& V )
             A_a.at(i)=B;
         }
 
-        for(int i=0; i<size_x; i=i+1) {
-            for(int j=0; j<size_x; j=j+1) {
+        for(int i=0; i<size_x; i=i+1)
+        {
+            for(int j=0; j<size_x; j=j+1)
+            {
                 vector < TinyMatrix<cd,3,3>  > lambda = get_lambda();
 
 
@@ -225,7 +246,9 @@ void IC_MV( colorArr& V )
                 in_exp=cd(0.0,0.0);
 
                 for(int a=0; a<8; a++)
+                {
                     in_exp = in_exp + lambda.at(a) * A_a.at(a)(i,j);
+                }
 
                 V_at_ij = matrix_exp_an_antiH(in_exp);
                 V(i,j) = Product(V(i,j),V_at_ij);
@@ -247,7 +270,7 @@ void IC_MV( colorArr& V )
 #include "fourier.h"
 
 
-string dname;
+string dname="/efs/dataHBT";
 
 complex<double> su3_group_element(colorMat V,  int a)
 {
@@ -261,7 +284,7 @@ void output(double Y,colorArr& V_c)
 {
     string fname;
     ofstream d_data;
-    fname = dname+"/S_" + toString(Y) + ".dat";
+    fname = dname+"/S_" + eventID + "_" + toString(Y) + ".dat";
     d_data.open(fname.c_str());
 
 
@@ -285,14 +308,18 @@ void output(double Y,colorArr& V_c)
     vector<double> normal(max_k_int);
     double Qs_Y = Qs(Y);
 
-    for (int i=0; i<max_k; i++) {
+    for (int i=0; i<max_k; i++)
+    {
         distr.at(i) = 0.0;
         normal.at(i) = 0.0;
     }
 
-    for(int a=0; a<9; a++) {
-        for(int i=0; i<size_x; i=i+1) {
-            for(int j=0; j<size_x; j=j+1) {
+    for(int a=0; a<9; a++)
+    {
+        for(int i=0; i<size_x; i=i+1)
+        {
+            for(int j=0; j<size_x; j=j+1)
+            {
                 double x = int_to_x(i);
                 double y = int_to_x(j);
 
@@ -304,10 +331,12 @@ void output(double Y,colorArr& V_c)
 
         FFTW(comp, compFT);
 
-        for(int i=0; i<size_x; i=i+1) {
+        for(int i=0; i<size_x; i=i+1)
+        {
             double kx  = 2.0*M_PI*i/L_x;
             double kx_t  = 2.0/step_x*sin(kx*step_x/2.0);
-            for(int j=0; j<size_x; j=j+1) {
+            for(int j=0; j<size_x; j=j+1)
+            {
 
                 double ky  = 2.0*M_PI*j/L_x;
                 double kx_t  = 1.0/step_x*sin(kx*step_x);
@@ -362,16 +391,20 @@ void output(double Y,colorArr& V_c)
     vector<double> aS(N);
     vector<double> aN(N);
 
-    for (int i=0; i<N; i++) {
+    for (int i=0; i<N; i++)
+    {
         aS[i]=0.0;
         aN[i]=0.0;
     }
 
-    for(int i=0; i<size_x; i++) {
-        for(int j=0; j<size_x; j++) {
+    for(int i=0; i<size_x; i++)
+    {
+        for(int j=0; j<size_x; j++)
+        {
             double r = sqrt(x2(int_to_x(i)) + x2(int_to_x(j)));
             int ir = int(r/dr);
-            if(ir<N) {
+            if(ir<N)
+            {
                 aS[ir] += 1.0-real(pS (i,j))*0.5/3.0/size_x2/size_x2 ;
                 aN[ir] += 1.0;
             }
@@ -380,10 +413,13 @@ void output(double Y,colorArr& V_c)
     }
 
 
-    for(int ir=0; ir<N; ir++) {
+    for(int ir=0; ir<N; ir++)
+    {
         double r = (double(ir)+0.5)*dr;
         if (r<0.5*L_x)
-            fileout <<  r  << " " << aS[ir]/aN[ir] << "\n" << flush;
+        {
+            d_data <<  r  << " " << aS[ir]/aN[ir] << "\n" << flush;
+        }
     }
 
     //d_data<< real(pS(0,0)) << " " <<  real(pSPerp(0,0)) << "\n" <<  flush;
@@ -391,66 +427,7 @@ void output(double Y,colorArr& V_c)
 }
 
 
-void Omega(colorArr& Omega_s, colorArr& Omega_a, colorArr V, vector<blitz::Array<double,2> > A_a)
-{
-    vector < TinyMatrix<cd,3,3>  > lambda = get_lambda();
 
-    colorMat W_x, W_y;
-
-    for(int i=0; i<size_x; i++)
-        for(int j=0; j<size_x; j++) {
-
-
-            Omega_s(i,j) = cd(0.0,0.0);
-            Omega_a(i,j) = cd(0.0,0.0);
-
-
-            for(int a=0; a<8; a++) {
-                //x component
-                double proton_part_x  =  0.5*(A_a.at(a)(index_x_boundary(i+1),j) - A_a.at(a)(index_x_boundary(i-1),j))/step_x;
-                W_x =  0.5/step_x*(Product( Product( dagger(V(index_x_boundary(i+1),j)),lambda.at(a) ),  V(index_x_boundary(i+1),j) )
-                                   -  Product( Product( dagger(V(index_x_boundary(i-1),j)),lambda.at(a) ),  V(index_x_boundary(i-1),j) ));
-
-                //y component
-                double proton_part_y  =  0.5*(A_a.at(a)(i,index_x_boundary(j+1)) - A_a.at(a)(i, index_x_boundary(j-1)))/step_x;
-                W_y =  0.5/step_x*(Product( Product( dagger(V(i,index_x_boundary(j+1))),lambda.at(a) ),  V(i,index_x_boundary(j+1)) )
-                                   -  Product( Product( dagger(V(i,index_x_boundary(j-1))),lambda.at(a) ),  V(i,index_x_boundary(j-1)) ));
-
-
-                Omega_s(i,j) = Omega_s(i,j) + proton_part_x * W_x + proton_part_y * W_y;
-                Omega_a(i,j) = Omega_a(i,j) + proton_part_x * W_y - proton_part_y * W_x;
-            }
-        }
-}
-
-
-double sign(double x)
-{
-    if(x<0) return -1.0;
-    //if(x*x<UV*UV) return 0;
-    return 1.0;
-}
-
-
-
-double SI(const int ik, const int jk, const vector<blitz::Array<cd,2> > &Omega_s, const vector<blitz::Array<cd,2> > & Omega_a)
-{
-    //cout << ik << " " << jk << "\n";
-    double kx  = 2.0*M_PI*ik/L_x;
-    double ky  = 2.0*M_PI*jk/L_x;
-    double kx_t  = 1.0/step_x*sin(kx*step_x);
-    double ky_t  = 1.0/step_x*sin(ky*step_x);
-    double k2 = pow(2.0/step_x*sin(kx*step_x/2),2) +  pow(2.0/step_x*sin(ky*step_x/2),2);
-
-    cd sum = cd(0,0);
-
-    for(int a=0; a<8; a++) {
-        sum+=Omega_s.at(a)(ik,jk)*conj(Omega_s.at(a)(ik,jk)) + Omega_a.at(a)(ik,jk)*conj(Omega_a.at(a)(ik,jk));
-    }
-
-
-    return real(sum)/(k2+UV)/pow(2*M_PI,3)/pow(L_x,2);
-}
 
 //Forward multiply by a^2
 //Backward divide by L^2
@@ -458,26 +435,24 @@ double SI(const int ik, const int jk, const vector<blitz::Array<cd,2> > &Omega_s
 
 int four_bound(int n)
 {
-    if(n<0) return n+size_x;
-    if(n>size_x-1) return n-size_x;
+    if(n<0)
+    {
+        return n+size_x;
+    }
+    if(n>size_x-1)
+    {
+        return n-size_x;
+    }
     return n;
 }
 
-void components(colorArr& Omega, vector<blitz::Array<cd,2> > & Omega_comp)
-{
-    for(int a=0; a<Omega_comp.size(); a++) {
-        Omega_comp.at(a).resize(Omega.shape());
-
-        for(int i=0; i<size_x; i++)
-            for(int j=0; j<size_x; j++) {
-                Omega_comp.at(a)(i,j) = su3_group_element(Omega(i,j), a);
-            }
-    }
-}
 
 int sign(int i)
 {
-    if(i<0) return -1;
+    if(i<0)
+    {
+        return -1;
+    }
     return 1;
 }
 
@@ -502,60 +477,92 @@ public:
 
 cd Dipole(const int ik, const int jk, const vector<blitz::Array<cd,2> > &V_W_c)
 {
-	cd sum=cd(0,0);
-	for(int a=0;a<V_W_c.size(); a++)
-	{
-		sum += conj( V_W_c.at(a)(ik,jk) ) * V_W_c.at(a)(ik,jk);  
-	}
-	sum *= 0.5; 
-	return sum; 
+    cd sum=cd(0,0);
+    for(int a=0; a<V_W_c.size(); a++)
+    {
+        sum += conj( V_W_c.at(a)(ik,jk) ) * V_W_c.at(a)(ik,jk);
+    }
+    sum *= 0.5;
+    return sum;
 }
 
-cd Quadrupole(const int ik1, const int jk1, const int ik2, const int jk2, const vector<blitz::Array<cd,2> > &V_W_c)
+
+void traceof4tau(Array<cd,4>& traceA)
+{ 
+	vector < TinyMatrix<cd,3,3>  > lambda = get_lambda();
+	traceA.resize(9,9,9,9);
+    TinyMatrix<cd,3,3> tmp;
+	for(int a=0; a<9; a++)
+        for(int b=0; b<9; b++)
+            for(int c=0; c<9; c++)
+                for(int d=0; d<9; d++)
+                {
+                    tmp=lambda.at(d);
+                    tmp=Product(lambda.at(c),tmp);
+                    tmp=Product(lambda.at(b),tmp);
+                    tmp=Product(lambda.at(a),tmp);
+
+                    traceA(a,b,c,d)  =  trace(tmp) ;
+                }
+}
+
+
+
+
+
+
+cd Quadrupole(const int ik1, const int jk1, const int ik2, const int jk2, const vector<blitz::Array<cd,2> > &V_W_c, const blitz::Array<cd,4>  &traceA)
 {
-	cd sum = cd(0,0);
-  	vector < TinyMatrix<cd,3,3>  > lambda = get_lambda();
-	TinyMatrix<cd,3,3> tmp;  
-	for(int a=0;a<V_W_c.size(); a++)
-	for(int b=0;b<V_W_c.size(); b++)
-	for(int c=0;c<V_W_c.size(); c++)
-	for(int d=0;d<V_W_c.size(); d++)
-	{
-		tmp=lambda.at(d);
-		tmp=Product(lambda.at(c),tmp); 
-		tmp=Product(lambda.at(b),tmp); 
-		tmp=Product(lambda.at(a),tmp);
+    cd sum = cd(0,0);
+    //vector < TinyMatrix<cd,3,3>  > lambda = get_lambda();
+    //TinyMatrix<cd,3,3> tmp;
+    for(int a=0; a<V_W_c.size(); a++)
+        for(int b=0; b<V_W_c.size(); b++)
+            for(int c=0; c<V_W_c.size(); c++)
+                for(int d=0; d<V_W_c.size(); d++)
+                {
+                    //tmp=lambda.at(d);
+                    //tmp=Product(lambda.at(c),tmp);
+                    //tmp=Product(lambda.at(b),tmp);
+                    //tmp=Product(lambda.at(a),tmp);
 
-		sum += conj( V_W_c.at(a)(ik1,jk1) ) * V_W_c.at(b)(ik1,jk1) *
-			   conj( V_W_c.at(c)(ik2,jk2) ) * V_W_c.at(d)(ik2,jk2) * trace(tmp) ;  
-	}
+                    sum += conj( V_W_c.at(a)(ik1,jk1) ) * V_W_c.at(b)(ik1,jk1) *
+                           conj( V_W_c.at(c)(ik2,jk2) ) * V_W_c.at(d)(ik2,jk2) * traceA(a,b,c,d); //trace(tmp) ;
+                }
 
-	return sum; 
+    return sum;
 }
 
 
 double int_to_k(int i)
 {
-      double k  = 2.0*M_PI*i/L_x;
-      double k_t  = 1.0/step_x*sin(k*step_x);
-	  return k_t; 
+    double k  = 2.0*M_PI*i/L_x;
+    double k_t  = 1.0/step_x*sin(k*step_x);
+    return k_t;
 }
 
 double int_to_k2(int i, int j)
 {
-     double kx  = 2.0*M_PI*i/L_x;
-     double ky  = 2.0*M_PI*j/L_x;
-	 return  pow(2.0/step_x*sin(kx*step_x/2),2) +  pow(2.0/step_x*sin(ky*step_x/2),2);
+	double kx  = 2.0*M_PI*i/L_x;
+    double ky  = 2.0*M_PI*j/L_x;
+    return  pow(2.0/step_x*sin(kx*step_x/2),2) +  pow(2.0/step_x*sin(ky*step_x/2),2);
 }
 
 
 
 void outHBT(double A, double B, const colorArr& V_c)
 {
-	clock_t begin = clock();
+    clock_t begin = clock();
     vector<blitz::Array<cd,2> > fftV_c_c(9);
+	
+	blitz::Array<cd,4>  traceA;
+	traceof4tau(traceA);
 
-    for(int a=0; a<9; a++) {
+
+
+
+    for(int a=0; a<9; a++)
+    {
         cerr <<  "cycle " << a  << "\n";
         fftV_c_c.at(a).resize(size_x,size_x);
 
@@ -564,22 +571,24 @@ void outHBT(double A, double B, const colorArr& V_c)
         blitz::Array<cd,2> tmp2(size_x,size_x);
 
 
-        for(int i=0; i<size_x; i=i+1) {
-            for(int j=0; j<size_x; j=j+1) {
+        for(int i=0; i<size_x; i=i+1)
+        {
+            for(int j=0; j<size_x; j=j+1)
+            {
                 double x = int_to_x(i);
                 double y = int_to_x(j);
-        	double x_c = int_to_x(size_x/2); 
-        	double y_c = int_to_x(size_x/2); 
-			double R = 5.0; 
-                tmp1(i,j) = su3_group_element(V_c(i,j), a) 
-					* exp(- pow((x-x_c)/R/A,2) - pow((y-y_c)/R/B,2)) ;
+                double x_c = int_to_x(size_x/2);
+                double y_c = int_to_x(size_x/2);
+                double R = 5.0;
+                tmp1(i,j) = su3_group_element(V_c(i,j), a)
+                            * exp(- pow((x-x_c)/R/A,2) - pow((y-y_c)/R/B,2)) ;
             }
         }
 
-		
+
         cerr << tmp1(0,0) << "\n" << flush;
 
-		FFTW(tmp1,tmp2);
+        FFTW(tmp1,tmp2);
 
         fftV_c_c.at(a)=tmp2*pow(step_x,2);
 
@@ -593,122 +602,185 @@ void outHBT(double A, double B, const colorArr& V_c)
 
     cerr << "FFT components done\n" << "time " << elapsed_secs   << endl << flush;
 
-	double dK = step_x*2.1;
-	double DK = step_x*4;
-	double Kmax = 5+DK;
+	double step_k = 2*M_PI/L_x; 
 
-	for(double K=DK;K<Kmax;K+=DK)
-	{
-	double v0_2 = 0.0;
-	double v2_2 = 0.0; 
-	double v3_2 = 0.0; 
+    double dK = 2.1*step_k;
+    double DK = 2.0*step_k;
+    double Kmax = 7+DK;
 
-	double vQ2_2 = 0.0; 
-	double vQ3_2 = 0.0; 
-
-	double vD2_2 = 0.0; 
-	double vD3_2 = 0.0; 
-
-	int N=0;
-
-	//cerr<< "K=" <<K << endl;
-    for(int i1=0; i1<size_x; i1=i1+1) {
-      double kx1_t  = int_to_k(i1);
-      for(int j1=0; j1<size_x; j1=j1+1) {
 	
-		  		
+	int NoF=64; 
+	vector<double> Input(NoF);
+	vector<int> Norm(NoF);
+
+	double step_phi = 2*M_PI/NoF;  
+
+    for(double K=DK+dK; K<Kmax; K+=DK)
+    {
+        
+		for (int i=0; i< NoF; i++) Input.at(0) = 0.0; 
+		for (int i=0; i< NoF; i++) Norm.at(0) = 0; 
+		
+		double v0_2 = 0.0;
+        double v0Q_2 = 0.0;
+        
+		cd v2_2 = cd(0.0,0.0);
+        cd vQ2_2 = cd(0.0,0.0);
+        cd vD2_2 = cd(0.0,0.0);
+
+        int N=0;
+
+        for(int i1=0; i1<size_x; i1=i1+1)
+        {
+            double kx1_t  = int_to_k(i1);
+
+            for(int j1=0; j1<size_x; j1=j1+1)
+            {
                 double ky1_t  = int_to_k(j1);
-                double k12 = int_to_k2(i1,j1); 
-	
-				if( ((sqrt(k12)-(K-0.5*dK)) * (sqrt(k12)-(K+0.5*dK)) <0.0 
-	  ) 
-		//	&& ((j1<size_x/4) || ((j1-3*size_x/4)*(j1-size_x/2)<0)) 
-		//	&& ((i1<size_x/4) || ((i1-3*size_x/4)*(i1-size_x/2)<0)) 
-			) 
-	{
-    for(int i2=0; i2<size_x; i2=i2+1) {
-      double kx2_t  = int_to_k(i2);
-      for(int j2=0; j2<size_x; j2=j2+1) {
-                
-                double ky2_t  = int_to_k(j2);
-		  	double k22 = int_to_k2(i2,j2) ;
-	
-				if(( (sqrt(k22)-(K-0.5*dK)) * (sqrt(k22)-(K+0.5*dK)) <0.0
-							  ) 
-		//	&& ((j2<size_x/4) || ((j2-3*size_x/4)*(j2-size_x/2)<0)) 
-		//	&& ((i2<size_x/4) || ((i2-3*size_x/4)*(i2-size_x/2)<0)) 
-						) 
-		{
-			double phi_1 = atan2(ky1_t,kx1_t); 	
-			double phi_2 = atan2(ky2_t,kx2_t); 
+                double k12 = int_to_k2(i1,j1);
 
-			double scalar_product = kx1_t*kx2_t+ky1_t*ky2_t; 
-			double cross_product = kx1_t*ky2_t-ky1_t*kx2_t; 
-			double delta_phi = atan2(cross_product,scalar_product); 
+                if( ((sqrt(k12)-(K-0.5*dK)) * (sqrt(k12)-(K+0.5*dK)) <0.0
+                    )
+                       // 	&& ((j1<size_x/4) || ((j1-3*size_x/4)*(j1-size_x/2)<0))
+                       // 	&& ((i1<size_x/4) || ((i1-3*size_x/4)*(i1-size_x/2)<0))
+                  )
+                {
+                    for(int i2=0; i2<size_x; i2=i2+1)
+                    {
+                        double kx2_t  = int_to_k(i2);
+                        for(int j2=0; j2<size_x; j2=j2+1)
+                        {
 
-			//if(delta_phi<0) delta_phi=delta_phi+2*M_PI; 
-			
+                            double ky2_t  = int_to_k(j2);
+                            double k22 = int_to_k2(i2,j2) ;
+
+                            if(( (sqrt(k22)-(K-0.5*dK)) * (sqrt(k22)-(K+0.5*dK)) <0.0
+                               )
+                                    //	&& ((j2<size_x/4) || ((j2-3*size_x/4)*(j2-size_x/2)<0))
+                                    //	&& ((i2<size_x/4) || ((i2-3*size_x/4)*(i2-size_x/2)<0))
+                              )
+                            {
+                                double phi_1 = atan2(ky1_t,kx1_t);
+                                double phi_2 = atan2(ky2_t,kx2_t);
+
+                                double scalar_product = kx1_t*kx2_t+ky1_t*ky2_t;
+                                double cross_product = kx1_t*ky2_t-ky1_t*kx2_t;
+                                double delta_phi = atan2(cross_product,scalar_product);
 
 
-			double D = dK*sqrt(k12*k22)*real(Dipole(i1,j1,fftV_c_c)*Dipole(i2,j2,fftV_c_c));  
-			double Q = dK*sqrt(k12*k22)*real(Quadrupole(i1,j1,i2,j2,fftV_c_c)); 
+                                double deltaK2 = int_to_k2(i1-i2,j1-j2);
+                                double cos2deltaphi = 2.0*pow((deltaK2 - k12 - k22)/(2.0*sqrt(k12*k22)),2)-1;
+                                //cerr << cos(2*delta_phi) << " " << cos2deltaphi << "\n";
 
-			v0_2 += (D+Q);  
-			v2_2 += (D+Q)*cos(2*delta_phi);  
-			v3_2 += (D+Q)*cos(3*delta_phi); 
+                                cd D = dK*dK*sqrt(k12*k22)*      (Dipole(i1,j1,fftV_c_c)*Dipole(i2,j2,fftV_c_c));
+                                cd Q = dK*dK*sqrt(k12*k22)*      (Quadrupole(i1,j1,i2,j2,fftV_c_c,traceA));
 
-			vQ2_2 += Q*cos(2*delta_phi);  
-			vQ3_2 += Q*cos(3*delta_phi);  
+                                //if(delta_phi<0) delta_phi=delta_phi+2*M_PI;
+								
+								//Input[int(delta_phi/step_phi)]+=dK*dK*sqrt(k12*k22)*real(D+Q);
+								//Norm[int(delta_phi/step_phi)]++;
 
-			vD2_2 += D*cos(2*delta_phi);  
-			vD3_2 += D*cos(3*delta_phi);  
+                                v0_2  += real(D+Q);
+                                v0Q_2 += real(Q);
 
-			N++;
-			/*int phi = delta_phi * 100; 
-			delta_phi = phi / 100.0;
+                                v2_2  += real(D+Q)*cos(2*delta_phi);  //*cos2deltaphi;
+                                vQ2_2 += real(Q)*cos(2*delta_phi);
+                                vD2_2 += real(D)*cos(2*delta_phi);
 
-			cout << K <<" "; 
-			cout << delta_phi <<" "; 
-			//cout << phi_1-phi_2 <<" "; 
-			cout << D <<" "; 
-			//cout << real(Dipole(i1,j1,fftV_c_c)) <<" "; 
-			cout << Q << " "; 
-			cout << phi_1 << " "; 
-			cout << phi_2 << " "; 
-			cout << kx1_t << " "; 
-			cout << ky1_t << " "; 
-			cout << kx2_t << " "; 
-			cout << ky2_t << " "; 
-			cout << endl; 
-			*/
-		}				
+                                N++;
+                                /*int phi = delta_phi * 100;
+                                delta_phi = phi / 100.0;
+*/
+                                /*cout << K <<" ";
+                                cout << delta_phi <<" ";
+                                cout << cos2deltaphi <<" ";
+                                //cout << phi_1-phi_2 <<" ";
+                                cout << D <<" ";
+                                //cout << real(Dipole(i1,j1,fftV_c_c)) <<" ";
+                                cout << Q << " ";
+                                cout << endl;
+                               */
+                            }
 
-	  }}
-	
-	}
-	
-	}}
-	
-	if(v0_2>0) cout 
-		<< A << " " << B << " " 
-		<< K 
-		<< " " << (v2_2/v0_2) 
-		//<< " " << (v3_2/v0_2)
-		<< " " << (vD2_2/v0_2) 
-		//<< " " << (vD3_2/v0_2)
-		<< " " << (vQ2_2/v0_2) 
-		<< " " << (v0_2/N) 
-		//<< " " << (vQ3_2/v0_2)
-		<< endl; 
-	}
+                        }
+                    }
+
+                }
+
+            }
+        }
+
+	  double sumV = 0.0; 
+	  double sumV2 = 0.0; 
+	  /*for(int i=0;i<NoF;i++)
+	  {
+	  	if(Norm[i]>0) sumV2 += Input[i]/Norm[i]*cos(2.0*step_phi*(double(i)+0.5));
+	  	if(Norm[i]>0) sumV += Input[i]/Norm[i];
+		if(Norm[i]==0) cerr << i << endl << flush; 
+	  }
+	  */
+
+
+      if(v0_2>0) cout
+                    << A << " " << B << " "
+                    << K
+                    << " " << real(v2_2/v0_2)
+                    //<< " " <<  sumV2/sumV
+                    //<< " " << (v3_2/v0_2)
+                    << " " << real(vD2_2/v0_2)
+                    //<< " " << (vD3_2/v0_2)
+                    << " " << real(vQ2_2/v0_2)
+                    << " " << (v0_2/N)
+                    << " " << (v0Q_2/N)
+                    //<< " " << (vQ3_2/v0_2)
+                    << endl << flush;
+    }
 
 
 }
 
 
 
+void test(void)
+{
+    vector < TinyMatrix<cd,3,3>  > lambda = get_lambda();
+
+    for(int a=0; a<9; a++)
+        for(int b=0; b<9; b++)
+        {
+            cerr << a << " " << b << " " << trace(Product(lambda.at(a), lambda.at(b))) << endl <<flush;
+        }
+
+
+    cerr << "################\n";
+
+
+    TinyMatrix<cd,3,3> tmp;
+    for(int a=0; a<9; a++)
+        for(int b=0; b<9; b++)
+            for(int c=0; c<9; c++)
+                for(int d=0; d<9; d++)
+                {
+                    tmp=lambda.at(d);
+                    tmp=Product(lambda.at(c),tmp);
+                    tmp=Product(lambda.at(b),tmp);
+                    tmp=Product(lambda.at(a),tmp);
+
+                    cerr <<
+                         a << " " <<
+                         b << " " <<
+                         c << " " <<
+                         d << " " <<
+                         trace(tmp) << endl << flush;
+                }
+
+}
+
+
 int main(void)
 {
+
+    //test();
     clock_t begin = clock();
     clock_t end = clock();
     double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
@@ -722,14 +794,10 @@ int main(void)
     end = clock();
     elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
     cerr << "target done\n" << "time " << elapsed_secs << flush  << endl;
+	
+	output(0.0,V_c);
 
-	outHBT(1.0, 1.0, V_c);
-    cerr << " one " << endl;
-	outHBT(2.0, 0.5, V_c); 
-    cerr << " two " << endl;
-	outHBT(0.5, 2.0, V_c); 
-    cerr << " three " << endl;
-	outHBT(3.0, 3.0, V_c); 
-    cerr << " four " << endl;
-
+    outHBT(1.0, 1.0, V_c);
+    outHBT(2, 0.5, V_c);
+    outHBT(5.0, 5.0, V_c);
 }
