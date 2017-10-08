@@ -609,17 +609,17 @@ void outHBT(double A, double B, const colorArr& V_c)
     double Kmax = 7+DK;
 
 	
-	int NoF=64; 
+	/*int NoF=64; 
 	vector<double> Input(NoF);
 	vector<int> Norm(NoF);
-
 	double step_phi = 2*M_PI/NoF;  
+*/
 
     for(double K=DK+dK; K<Kmax; K+=DK)
     {
         
-		for (int i=0; i< NoF; i++) Input.at(0) = 0.0; 
-		for (int i=0; i< NoF; i++) Norm.at(0) = 0; 
+		//for (int i=0; i< NoF; i++) Input.at(0) = 0.0; 
+		//for (int i=0; i< NoF; i++) Norm.at(0) = 0; 
 		
 		double v0_2 = 0.0;
         double v0Q_2 = 0.0;
@@ -627,6 +627,9 @@ void outHBT(double A, double B, const colorArr& V_c)
 		cd v2_2 = cd(0.0,0.0);
         cd vQ2_2 = cd(0.0,0.0);
         cd vD2_2 = cd(0.0,0.0);
+
+		cd v2_1 = cd(0.0,0.0); 
+		double v0_1 = 0.0; 
 
         int N=0;
 
@@ -645,7 +648,15 @@ void outHBT(double A, double B, const colorArr& V_c)
                        // 	&& ((i1<size_x/4) || ((i1-3*size_x/4)*(i1-size_x/2)<0))
                   )
                 {
-                    for(int i2=0; i2<size_x; i2=i2+1)
+                    cd D1 = Dipole(i1,j1,fftV_c_c); 
+                    double phi_1 = atan2(ky1_t,kx1_t);
+
+					v0_1 += sqrt(k12)*dK*real(D1) ; 
+					v2_1 += sqrt(k12)*dK*D1*exp(2.0*phi_1*cd(0.0,1.0)) ; 
+					
+					
+
+					for(int i2=0; i2<size_x; i2=i2+1)
                     {
                         double kx2_t  = int_to_k(i2);
                         for(int j2=0; j2<size_x; j2=j2+1)
@@ -660,19 +671,18 @@ void outHBT(double A, double B, const colorArr& V_c)
                                     //	&& ((i2<size_x/4) || ((i2-3*size_x/4)*(i2-size_x/2)<0))
                               )
                             {
-                                double phi_1 = atan2(ky1_t,kx1_t);
-                                double phi_2 = atan2(ky2_t,kx2_t);
+                                //double phi_2 = atan2(ky2_t,kx2_t);
 
                                 double scalar_product = kx1_t*kx2_t+ky1_t*ky2_t;
                                 double cross_product = kx1_t*ky2_t-ky1_t*kx2_t;
                                 double delta_phi = atan2(cross_product,scalar_product);
 
 
-                                double deltaK2 = int_to_k2(i1-i2,j1-j2);
-                                double cos2deltaphi = 2.0*pow((deltaK2 - k12 - k22)/(2.0*sqrt(k12*k22)),2)-1;
+                                //double deltaK2 = int_to_k2(i1-i2,j1-j2);
+                                //double cos2deltaphi = 2.0*pow((deltaK2 - k12 - k22)/(2.0*sqrt(k12*k22)),2)-1;
                                 //cerr << cos(2*delta_phi) << " " << cos2deltaphi << "\n";
-
-                                cd D = dK*dK*sqrt(k12*k22)*      (Dipole(i1,j1,fftV_c_c)*Dipole(i2,j2,fftV_c_c));
+								
+                                cd D = dK*dK*sqrt(k12*k22)*      (D1 * Dipole(i2,j2,fftV_c_c));
                                 cd Q = dK*dK*sqrt(k12*k22)*      (Quadrupole(i1,j1,i2,j2,fftV_c_c,traceA));
 
                                 //if(delta_phi<0) delta_phi=delta_phi+2*M_PI;
@@ -710,9 +720,9 @@ void outHBT(double A, double B, const colorArr& V_c)
             }
         }
 
-	  double sumV = 0.0; 
+	  /*double sumV = 0.0; 
 	  double sumV2 = 0.0; 
-	  /*for(int i=0;i<NoF;i++)
+	  for(int i=0;i<NoF;i++)
 	  {
 	  	if(Norm[i]>0) sumV2 += Input[i]/Norm[i]*cos(2.0*step_phi*(double(i)+0.5));
 	  	if(Norm[i]>0) sumV += Input[i]/Norm[i];
@@ -732,6 +742,8 @@ void outHBT(double A, double B, const colorArr& V_c)
                     << " " << real(vQ2_2/v0_2)
                     << " " << (v0_2/N)
                     << " " << (v0Q_2/N)
+                    << " " << real(v2_1/v0_1)
+                    << " " << imag(v2_1/v0_1)
                     //<< " " << (vQ3_2/v0_2)
                     << endl << flush;
     }
@@ -799,5 +811,5 @@ int main(void)
 
     outHBT(1.0, 1.0, V_c);
     outHBT(2, 0.5, V_c);
-    outHBT(5.0, 5.0, V_c);
+    outHBT(3.0/2.0, 2.0/3.0, V_c);
 }
