@@ -1,7 +1,7 @@
 #include "JIMWLK.h"
 #include "string_conv.h"
 #include <map>
-##include <omp.h>
+//#include <omp.h>
 
 
 using namespace std;
