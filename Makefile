@@ -5,6 +5,9 @@ CFLAGS= -std=c++11 -O2 -lgsl -lgslcblas -lfftw3
 
 
 
+v3: 
+	/usr/local/Cellar/llvm/5.0.0/bin/clang++ -I /sw/include -I/sw/opt/boost-1_58/include/ -I /home/vskokov/lib/include -I /home/vskokov/lib/include  -I /sw/include -I/sw/opt/boost-1_58/include/ -I/usr/local/include  -L /sw/lib/ -L/home/vskokov/lib/lib -L  /home/vskokov/MC_DiJet/interp2d -L /home/vskokov/lib/lib  -L/usr/local/lib -L /usr/local/Cellar/llvm/5.0.0/lib  -O3 -o v3p.x v3_mp_par.cpp zheevc3.c zheevv3.c -fopenmp  -lboost_system -lgsl -lgslcblas -lfftw3 -lm
+
 v2: 
 	g++  $(INCLUDES) $(LIBS) -O3 -w -o v2.x v2_elliptic.cpp zheevc3.c zheevv3.c   -lgsl -lgslcblas -lfftw3 -lm
 
@@ -20,8 +23,26 @@ HBT:
 all05: 
 	g++  $(INCLUDES) $(LIBS) -O3 -o v3p05.x v3_mp_par.cpp zheevc3.c zheevv3.c -fopenmp  -lboost_system -lgsl -lgslcblas -lfftw3 -lm
 
+allD: 
+	g++  $(INCLUDES) $(LIBS) -O3 -o v3D.x v3_dilute.cpp zheevc3.c zheevv3.c    -lgsl -lgslcblas -lfftw3 -lm
+
+allDq: 
+	g++  $(INCLUDES) $(LIBS) -O3 -o v3D.x v3_dilute.cpp zheevc3.c zheevv3.c  -fopenmp -lboost_system -lgsl -lgslcblas -lfftw3 -lm
+
 all: 
-	g++  $(INCLUDES) $(LIBS) -O3 -o v3p.x v3_mp_par.cpp zheevc3.c zheevv3.c -fopenmp  -lboost_system -lgsl -lgslcblas -lfftw3 -lm
+	g++  $(INCLUDES) $(LIBS) -O3 -o v3.x v3_mp_par.cpp zheevc3.c zheevv3.c -fopenmp  -lboost_system    -lgsl -lgslcblas -lfftw3 -lm
+
+
+corr: 
+	g++  $(INCLUDES) $(LIBS) -O3 -o v3_corr.x v3_corr.cpp zheevc3.c zheevv3.c -fopenmp  -lboost_system    -lgsl -lgslcblas -lfftw3 -lm
+
+corrSP: 
+	g++  $(INCLUDES) $(LIBS) -O3 -o corr.x v3_corr_SP.cpp zheevc3.c zheevv3.c   -lgsl -lgslcblas -lfftw3 -lm
+
+
+corrq: 
+	g++  $(INCLUDES) $(LIBS) -O3 -o v3_corrq.x v3_corr.cpp zheevc3.c zheevv3.c -fopenmp  -lboost_system    -lgsl -lgslcblas -lfftw3 -lm
+
 allq: 
 	g++  $(INCLUDES) $(LIBS) -O3 -o v3.x v3_mv.cpp zheevc3.c zheevv3.c  -lgsl -lgslcblas -lfftw3
 MV: 

@@ -1,7 +1,7 @@
 #include "JIMWLK.h"
 #include "string_conv.h"
 #include <map>
-#include <omp.h>
+##include <omp.h>
 
 
 using namespace std;
@@ -824,11 +824,11 @@ cin >> eventID;
     double Qs2= pow(Qs(0),2);
 
    	double dK = 2*step_k;
-    double DK = dK/2;
+    double DK = dK*2;
     double Kmax = 10+DK;
 	int NK = (Kmax-DK-dK)/DK;  
 	int nk;
-	#pragma  omp parallel for schedule(static,5)
+	//#pragma  omp parallel for schedule(static,5)
     for(nk=0; nk<NK; nk++)
     {
 		cerr << nk << "\n" << flush;
@@ -864,36 +864,12 @@ cin >> eventID;
                     cd amp3 = AsSI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
                     double phi_1 = atan2(ky1_t,kx1_t);
 
-					cerr << K << " " << k1 << " "<< phi_1 << " " << cos(2*phi_1) << " " << (x2(kx1_t)- x2(ky1_t))/(x2(kx1_t) + x2(ky1_t)) << " " << (x2(kx1_t)- x2(ky1_t))/k12  << "\n"; 
-				
 					std::cout << (ParallelStream() 
-     				<< "# " << K << " " << phi_1 << " " << real(k1*dK*amp) << " " << real(k1*dK*amp3)
+     				<< K << " " << phi_1 << " " << real(k1*dK*amp) << " " << real(k1*dK*amp3)
 					<< "\n").toString() << flush;
 									
-
-					v0 += real(k1*dK*amp) ;
-					v1 += k1*dK*amp3*exp(1.0*phi_1*cd(0.0,1.0)) ;	 
-					v2 += k1*dK*amp*exp(2.0*phi_1*cd(0.0,1.0)) ;
-					v3 += k1*dK*amp3*exp(3.0*phi_1*cd(0.0,1.0)) ;
-					v4 += k1*dK*amp*exp(4.0*phi_1*cd(0.0,1.0)) ;  
-					v5 += k1*dK*amp3 ;  
 					N++;
 
-					/*std::cout << (ParallelStream() 
-     				<< K << " " << phi_1 //1, 2
-					<< " "<< (amp) //3 
-					<< " " << (amp3) //4 
-					//<< " " << kx1_t 
-					//<< " " << ky1_t
-					<< " " << i1
-					<< " " << j1
-					<< " " << k1
-					<< " " <<  SI(i1, j1, fftOmega_s_c, fftOmega_a_c)
-					<< " " <<  SI(four_bound(size_x-i1), four_bound(size_x-j1), fftOmega_s_c, fftOmega_a_c)
-					<< " " <<  AsSI(i1, j1, fftOmega_s_c, fftOmega_a_c)
-					<< " " <<  AsSI(four_bound(size_x-i1), four_bound(size_x-j1), fftOmega_s_c, fftOmega_a_c)
-     				<< "\n").toString() << flush;
-					*/
 
                  }
 				}
@@ -902,18 +878,6 @@ cin >> eventID;
 			}
 
      	}
-     	
-		std::cout << (ParallelStream() 
-     	<< K << " " << v0/N //1, 2
-     	<< " " << real(v2)/v0 //3 
-     	<< " " << imag(v2)/v0 //4
-     	<< " " << real(v3)/v0 //5 
-     	<< " " << imag(v3)/v0 //6 
-     	<< " " << real(v2*conj(v2))/x2(v0) //7 
-     	<< " " << real(v3*conj(v3))/x2(v0) //8
-     	<< " " << real(v4*conj(v4))/x2(v0) //9
-     	<< " " << real(v5*conj(v5))/x2(v0) //10
-     	<< "\n").toString() << flush;
 		
     }
 }

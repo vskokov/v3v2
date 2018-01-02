@@ -19,7 +19,7 @@
 #ifndef __ZHEEVC3_H
 #define __ZHEEVC3_H
 
-#include <complex>
+//#include <complex>
 #include <blitz/blitz.h>
 #include <blitz/array.h>
 
