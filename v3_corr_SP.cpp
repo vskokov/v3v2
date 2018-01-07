@@ -841,6 +841,8 @@ cin >> eventID;
 	KV.push_back(5.10509); 
 	KV.push_back(5.89049); 
 
+	KV.push_back(4.0); 
+	KV.push_back(4.8); 
 
     for(nk=0; nk<KV.size(); nk++)
     {
