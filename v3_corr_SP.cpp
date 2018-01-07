@@ -735,7 +735,183 @@ public:
     }
 };
 
+
+
+
+
+
+
 int main(void)
+{
+	clock_t begin = clock();
+	clock_t end = clock();
+	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+
+cin >> eventID;
+
+	cin >> A;
+	cin >> B;
+    dname = "v3_data"+eventID;
+    mkdir(dname.c_str(),S_IRWXU | S_IRWXG);
+
+    string name = dname+"/MD_" + eventID + ".dat";
+    fileout.open(name.c_str());
+
+    //Target:
+    colorArr V_c(size_x,size_x);
+    begin = clock();
+    IC_MV(V_c);
+    end = clock();
+    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    cerr << "target done\n" << "time " << elapsed_secs << flush  << endl;
+
+    //Projectile:
+    //
+    vector<blitz::Array<double,2> > A_a(8);
+    begin = clock();
+    IC_p(A_a);
+    end = clock();
+    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    cerr << "projectile done\n" << "time " << elapsed_secs << flush  << endl;
+
+    begin = clock();
+    colorArr Omega_a(size_x,size_x), Omega_s(size_x,size_x);
+    vector<blitz::Array<cd,2> > Omega_a_c(8), Omega_s_c(8);
+    vector<blitz::Array<cd,2> > fftOmega_a_c(8), fftOmega_s_c(8);
+
+    Omega(Omega_s, Omega_a, V_c, A_a);
+    end = clock();
+    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+
+    cerr << "omega done\n" << "time " << elapsed_secs << flush <<  endl;
+
+    output(0.0, V_c);
+
+    V_c.free();
+    for (int a=0; a<8; a++) A_a.at(a).free();
+    cerr << "output done\n" << endl;
+
+    components(Omega_s, Omega_s_c);
+    components(Omega_a, Omega_a_c);
+
+    Omega_s.free();
+    Omega_a.free();
+    cerr <<  "components done" << "\n";
+
+    begin = clock();
+    for(int a=0; a<8; a++)
+    {
+        cerr <<  "cycle " << a  << "\n";
+        fftOmega_a_c.at(a).resize(size_x,size_x);
+        fftOmega_s_c.at(a).resize(size_x,size_x);
+
+        blitz::Array<cd,2> tmp1(size_x,size_x);
+        blitz::Array<cd,2> tmp2(size_x,size_x);
+
+        tmp1 = Omega_a_c.at(a);
+        FFTW(tmp1,tmp2);
+        fftOmega_a_c.at(a)=tmp2*pow(step_x,2);
+
+        tmp1 = Omega_s_c.at(a);
+        FFTW(tmp1,tmp2);
+        fftOmega_s_c.at(a)=tmp2*pow(step_x,2);
+
+        cerr << fftOmega_a_c.at(a)(0,0) << " " << fftOmega_s_c.at(a)(0,0) << "\n" << flush;
+
+        Omega_s_c.at(a).free();
+        Omega_a_c.at(a).free();
+
+    }
+    end = clock();
+
+    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    cerr << "components done\n" << "time " << elapsed_secs   << endl << flush;
+
+    double Qs2= pow(Qs(0),2);
+
+   	double dK = 2*step_k;
+    double DK = dK*2;
+    double Kmax = 10+DK;
+	int NK = (Kmax-DK-dK)/DK;  
+	int nk;
+
+
+
+	vector<double> KV; 
+	KV.push_back(5.10509); 
+	KV.push_back(5.89049); 
+
+
+    for(nk=0; nk<KV.size(); nk++)
+    {
+		cerr << nk << "\n" << flush;
+		
+		double K = KV.at(nk); 
+		cerr << K << "\n" << flush;
+		double v0 = 0.0; 
+		cd v1 = cd(0.0,0.0);	
+		cd v2 = cd(0.0,0.0);
+		cd v3 = cd(0.0,0.0);
+		cd v4 = cd(0.0,0.0);
+		cd v5 = cd(0.0,0.0);
+
+        int N=0;
+
+        for(int i1=0; i1<size_x; i1=i1+1)
+        {
+			if( (i1<size_x/4+1)||(i1>3*size_x/4-1) ){
+            double kx1_t  = int_to_k(i1);
+
+            for(int j1=0; j1<size_x; j1=j1+1)
+            {
+				if( (j1<size_x/4+1)||(j1>3*size_x/4-1) )
+				{
+                double ky1_t  = int_to_k(j1);
+                //double k12 =  x2(kx1_t) + x2(ky1_t); //   int_to_k2(i1,j1);
+                double k12 =  int_to_k2(i1,j1);
+
+				double k1 = sqrt(k12); 
+                if( (k1-(K-0.5*dK) ) * ( k1-(K+0.5*dK) )  <0.0 )
+                {
+                    cd amp = SI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
+                    cd amp3 = AsSI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
+                    double phi_1 = atan2(ky1_t,kx1_t);
+
+					std::cout << (ParallelStream() 
+     				<< K << " " << phi_1 << " " << real(k1*dK*amp) << " " << real(k1*dK*amp3)
+					<< "\n").toString() << flush;
+									
+					N++;
+
+
+                 }
+				}
+
+            }
+			}
+
+     	}
+		
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int main_old(void)
 {
 	clock_t begin = clock();
 	clock_t end = clock();
