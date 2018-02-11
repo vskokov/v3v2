@@ -135,7 +135,7 @@ void rho_generator_p(blitz::Array<double,2>& rho)
 {
     double xc = int_to_x(size_x/2);
     double yc = int_to_x(size_x/2);
-    double R = 3.0/(g2mu);
+    double R = 2.0;
 
     for(int i=0; i<size_x; i++)
     {
@@ -460,7 +460,7 @@ void output(double Y,const colorArr& V_c)
     {
         double r = (double(ir)+0.5)*dr;
         if (r<0.5*L_x) 
-			fileout <<  r  << " " << aS[ir]/aN[ir] << "\n" << flush;
+			//fileout <<  r  << " " << aS[ir]/aN[ir] << "\n" << flush;
     }
 
     //d_data<< real(pS(0,0)) << " " <<  real(pSPerp(0,0)) << "\n" <<  flush;
@@ -751,11 +751,11 @@ cin >> eventID;
 
 	cin >> A;
 	cin >> B;
-    dname = "v3_data"+eventID;
-    mkdir(dname.c_str(),S_IRWXU | S_IRWXG);
+    //dname = "v3_data_2018_"+eventID;
+    //mkdir(dname.c_str(),S_IRWXU | S_IRWXG);
 
-    string name = dname+"/MD_" + eventID + ".dat";
-    fileout.open(name.c_str());
+    //string name = dname+"/MD_" + eventID + ".dat";
+    //fileout.open(name.c_str());
 
     //Target:
     colorArr V_c(size_x,size_x);
@@ -785,7 +785,7 @@ cin >> eventID;
 
     cerr << "omega done\n" << "time " << elapsed_secs << flush <<  endl;
 
-    output(0.0, V_c);
+    //output(0.0, V_c);
 
     V_c.free();
     for (int a=0; a<8; a++) A_a.at(a).free();
@@ -838,11 +838,35 @@ cin >> eventID;
 
 
 	vector<double> KV; 
-	KV.push_back(5.10509); 
-	KV.push_back(5.89049); 
+	KV.push_back(0.5); 
+	KV.push_back(1); 
+	KV.push_back(1.5); 
+	KV.push_back(2); 
+	KV.push_back(2.5); 
+	KV.push_back(3); 
+	KV.push_back(3.5); 
+	KV.push_back(4); 
+	KV.push_back(4.5); 
+	KV.push_back(5); 
+	KV.push_back(5.5); 
+	KV.push_back(6); 
+	KV.push_back(6.5); 
+	KV.push_back(7); 
+	KV.push_back(8); 
+	KV.push_back(9); 
+	KV.push_back(10); 
+	KV.push_back(11); 
+	KV.push_back(12); 
+	KV.push_back(13); 
+	KV.push_back(14); 
+	KV.push_back(15); 
 
-	KV.push_back(4.0); 
-	KV.push_back(4.8); 
+
+  	for(nk=0; nk<KV.size(); nk++)
+    {
+		KV.at(nk) = KV.at(nk)*Qs(0);  
+	}
+
 
     for(nk=0; nk<KV.size(); nk++)
     {
@@ -879,6 +903,12 @@ cin >> eventID;
                     cd amp3 = AsSI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
                     double phi_1 = atan2(ky1_t,kx1_t);
 
+					v0+=real(amp)  ; 
+					v1+= amp3  * exp( cd(0.0,1.0) * phi_1) ; 
+					v2+= amp *  exp( cd(0.0,2.0) * phi_1) ; 
+					v3+= amp3 * exp( cd(0.0,3.0) * phi_1) ; 
+					v5+= amp3 * exp( cd(0.0,5.0) * phi_1) ; 
+
 					std::cout << (ParallelStream() 
      				<< K << " " << phi_1 << " " << real(k1*dK*amp) << " " << real(k1*dK*amp3)
 					<< "\n").toString() << flush;
@@ -893,6 +923,13 @@ cin >> eventID;
 			}
 
      	}
+
+		cout << "# " << K<< " "   
+			<< v0 << " " 
+			<< real(v1)/v0 << " " << imag(v1)/v0 << " " 
+			<< real(v2)/v0 << " " << imag(v2)/v0 << " " 
+			<< real(v3)/v0 << " " << imag(v3)/v0 << " "  
+			<< real(v5)/v0 << " " << imag(v5)/v0 << std::endl;  
 		
     }
 }
@@ -957,7 +994,7 @@ cin >> eventID;
 
     cerr << "omega done\n" << "time " << elapsed_secs << flush <<  endl;
 
-    output(0.0, V_c);
+    //output(0.0, V_c);
 
     V_c.free();
     for (int a=0; a<8; a++) A_a.at(a).free();
