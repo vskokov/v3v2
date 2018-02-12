@@ -43,6 +43,12 @@ corrSP:
 corrSPNew: 
 	g++  $(INCLUDES) $(LIBS) -O3 -o corrNew.x v3_corr_SP.cpp zheevc3.c zheevv3.c   -lgsl -lgslcblas -lfftw3 -lm
 
+
+corrSPq: 
+	g++  $(INCLUDES) $(LIBS) -O3 -o corrq.x v3_corr_SP.cpp zheevc3.c zheevv3.c   -lgsl -lgslcblas -lfftw3 -lm
+
+
+
 corrq: 
 	g++  $(INCLUDES) $(LIBS) -O3 -o v3_corrq.x v3_corr.cpp zheevc3.c zheevv3.c -fopenmp  -lboost_system    -lgsl -lgslcblas -lfftw3 -lm
 

@@ -460,7 +460,7 @@ void output(double Y,const colorArr& V_c)
     {
         double r = (double(ir)+0.5)*dr;
         if (r<0.5*L_x) 
-			//fileout <<  r  << " " << aS[ir]/aN[ir] << "\n" << flush;
+			fileout <<  r  << " " << aS[ir]/aN[ir] << "\n" << flush;
     }
 
     //d_data<< real(pS(0,0)) << " " <<  real(pSPerp(0,0)) << "\n" <<  flush;
