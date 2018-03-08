@@ -890,6 +890,12 @@ cin >> eventID;
 
 				SIP_p(i1,j1) = SIP(i1,j1);
 				SIP_A(i1,j1) = SIP(i1,j1);
+
+				if(k12<1e-10) 
+				{
+					SIP(i1,j1) = 0.0; 
+				}
+
 				
 				if(k12<g2mu*g2mu) 
 				{
