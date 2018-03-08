@@ -612,7 +612,7 @@ cd SI(const int ik, const int jk, const vector<blitz::Array<cd,2> > &Omega_s, co
         sum+=Omega_s.at(a)(ik,jk)*Omega_s.at(a)(four_bound(size_x-ik),four_bound(size_x-jk)) + Omega_a.at(a)(ik,jk)*Omega_a.at(a)(four_bound(size_x-ik),four_bound(size_x-jk));
     }
 
-    return (sum)/(k2)/pow(2*M_PI,3)/pow(L_x,2);
+    return (sum)/(k2+1e-7)/pow(2*M_PI,3)/pow(L_x,2);
     //return Omega_s.at(1)(ik,jk)/pow(2*M_PI,3)/pow(L_x,2);
 }
 
@@ -837,7 +837,15 @@ cin >> eventID;
 
 
 
-	vector<double> KV; 
+	vector<double> KV;
+
+
+	for(double k=0.5; k<25;  k+=0.05)
+	{
+		KV.push_back(k); 
+	}
+
+	/*
 	KV.push_back(0.5); 
 	KV.push_back(1); 
 	KV.push_back(1.5); 
@@ -859,7 +867,7 @@ cin >> eventID;
 	KV.push_back(12); 
 	KV.push_back(13); 
 	KV.push_back(14); 
-	KV.push_back(15); 
+	KV.push_back(15); */
 
 
   	for(nk=0; nk<KV.size(); nk++)
@@ -867,8 +875,46 @@ cin >> eventID;
 		KV.at(nk) = KV.at(nk)*Qs(0);  
 	}
 
+	blitz::Array<cd,2> SIP(size_x,size_x);
+	blitz::Array<cd,2> SIP_p(size_x,size_x);
+	blitz::Array<cd,2> SIP_A(size_x,size_x);
 
-    for(nk=0; nk<KV.size(); nk++)
+	blitz::Array<cd,2> SIPx(size_x,size_x);
+
+	for(int i1=0; i1<size_x; i1=i1+1)
+        {
+            for(int j1=0; j1<size_x; j1=j1+1)
+            {
+ 				double k12 =  int_to_k2(i1,j1);
+				SIP(i1,j1) = SI(i1, j1, fftOmega_s_c, fftOmega_a_c); //populate the matrix for future back FFT
+
+				SIP_p(i1,j1) = SIP(i1,j1);
+				SIP_A(i1,j1) = SIP(i1,j1);
+				
+				if(k12<g2mu*g2mu) 
+				{
+					SIP_p(i1,j1) = 0.0; 
+				}
+
+				if(k12<1.0) 
+				{
+					SIP_A(i1,j1) = 0.0; 
+				}
+			}
+		}
+
+
+
+    FFTW_b(SIP, SIPx);
+	double Mult = real(SIPx(0,0)); 
+
+    FFTW_b(SIP_p, SIPx);
+	double Mult_p = real(SIPx(0,0)); 
+
+	FFTW_b(SIP_A, SIPx);
+	double Mult_A = real(SIPx(0,0)); 
+    
+	for(nk=0; nk<KV.size(); nk++)
     {
 		cerr << nk << "\n" << flush;
 		
@@ -881,7 +927,10 @@ cin >> eventID;
 		cd v4 = cd(0.0,0.0);
 		cd v5 = cd(0.0,0.0);
 
-        int N=0;
+		
+		
+		
+		int N=0;
 
         for(int i1=0; i1<size_x; i1=i1+1)
         {
@@ -900,7 +949,8 @@ cin >> eventID;
                 if( (k1-(K-0.5*dK) ) * ( k1-(K+0.5*dK) )  <0.0 )
                 {
                     cd amp = SI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
-                    cd amp3 = AsSI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
+                    cd amp3 = cd(0.0); 
+						//AsSI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
                     double phi_1 = atan2(ky1_t,kx1_t);
 
 					v0+=real(amp)  ; 
@@ -929,7 +979,12 @@ cin >> eventID;
 			<< real(v1)/v0 << " " << imag(v1)/v0 << " " 
 			<< real(v2)/v0 << " " << imag(v2)/v0 << " " 
 			<< real(v3)/v0 << " " << imag(v3)/v0 << " "  
-			<< real(v5)/v0 << " " << imag(v5)/v0 << std::endl;  
+			<< real(v5)/v0 << " " << imag(v5)/v0 << " " 
+			<< Mult <<  " "  
+			<< Mult_p <<  " "  
+			<< Mult_A <<  " "  
+			<<
+			std::endl;  
 		
     }
 }
