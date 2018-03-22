@@ -964,8 +964,7 @@ cin >> eventID;
                 if( (k1-(K-0.5*dK) ) * ( k1-(K+0.5*dK) )  <0.0 )
                 {
                     cd amp = SI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
-                    cd amp3 = cd(0.0); 
-					AsSI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
+                    cd amp3 = AsSI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
                     double phi_1 = atan2(ky1_t,kx1_t);
 
 					v0+=real(amp)  ; 
