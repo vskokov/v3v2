@@ -1,3 +1,12 @@
+//ipython notebook --no-browser --port=8890 V3\ Analysis_quark.ipynb
+//on quark
+
+//locally
+//ssh -i ~/.ssh/bnl  -N -f -L  localhost:8890:localhost:8890 vskokov@quark.phy.bnl.gov
+
+
+
+
 #include "JIMWLK.h"
 #include "string_conv.h"
 #include <map>
@@ -44,6 +53,7 @@ ofstream fileout;
 double A=1.0;
 double B=1.0/A;
 
+int comp_v3=0;
 
 /*
 AdComp DecomposeAdMatrix(colorAdMat U)
@@ -747,10 +757,12 @@ int main(void)
 	clock_t end = clock();
 	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
 
-cin >> eventID;
+    cin >> eventID;
 
 	cin >> A;
 	cin >> B;
+    
+    cin >> comp_v3;
     //dname = "v3_data_2018_"+eventID;
     //mkdir(dname.c_str(),S_IRWXU | S_IRWXG);
 
@@ -964,7 +976,8 @@ cin >> eventID;
                 if( (k1-(K-0.5*dK) ) * ( k1-(K+0.5*dK) )  <0.0 )
                 {
                     cd amp = SI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
-                    cd amp3 = AsSI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
+                    cd amp3=cd(0.0,0.0);
+                    if(comp_v3==1) amp3 = AsSI(i1, j1, fftOmega_s_c, fftOmega_a_c);
                     double phi_1 = atan2(ky1_t,kx1_t);
 
 					v0+=real(amp)  ; 
