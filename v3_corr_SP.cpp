@@ -678,14 +678,14 @@ cd AsSI(const int ik, const int jk, const vector<blitz::Array<cd,2> > &Omega_s, 
                                      -  q_dot_k_minus_q * ( Omega_a.at(a)(i,j) * Omega_a.at(b)(itemp,jtemp)
                                                             + Omega_s.at(a)(i,j) * Omega_s.at(b)(itemp,jtemp) )
                                     ) * (Omega_a.at(c)(four_bound(size_x-ik),four_bound(size_x-jk)))
-                                    + 2.0 * k_dot_k_minus_q * Omega_a.at(a)(i,j) * Omega_s.at(b)(itemp,jtemp) * (Omega_a.at(c)(four_bound(size_x-ik),four_bound(size_x-jk)))
+                                    + 2.0 * k_dot_k_minus_q * Omega_a.at(a)(i,j) * Omega_s.at(b)(itemp,jtemp) * (Omega_s.at(c)(four_bound(size_x-ik),four_bound(size_x-jk)))
 									-
                                     (
 									 (k2 *  Omega_a.at(a)(four_bound(size_x-i),four_bound(size_x-j)) * Omega_a.at(b)(four_bound(size_x-itemp),four_bound(size_x-jtemp))
                                      -  q_dot_k_minus_q * ( Omega_a.at(a)(four_bound(size_x-i),four_bound(size_x-j)) * Omega_a.at(b)(four_bound(size_x-itemp),four_bound(size_x-jtemp))
                                                             + Omega_s.at(a)(four_bound(size_x-i),four_bound(size_x-j)) * Omega_s.at(b)(four_bound(size_x-itemp),four_bound(size_x-jtemp)) )
                                     ) * (Omega_a.at(c)(ik,jk))
-                                    + 2.0 * k_dot_k_minus_q * Omega_a.at(a)(four_bound(size_x-i),four_bound(size_x-j)) * Omega_s.at(b)(four_bound(size_x-itemp),four_bound(size_x-jtemp)) * (Omega_a.at(c)(ik,jk))
+                                    + 2.0 * k_dot_k_minus_q * Omega_a.at(a)(four_bound(size_x-i),four_bound(size_x-j)) * Omega_s.at(b)(four_bound(size_x-itemp),four_bound(size_x-jtemp)) * (Omega_s.at(c)(ik,jk))
 									)
                                 );
 							}
@@ -839,8 +839,17 @@ cin >> eventID;
 
 	vector<double> KV;
 
+	for(double k=0.5; k<6.1;  k+=0.5)
+	{
+		KV.push_back(k); 
+	}
 
-	for(double k=0.5; k<25;  k+=0.05)
+	for(double k=7; k<10;  k+=1)
+	{
+		KV.push_back(k); 
+	}
+
+	for(double k=10; k<17;  k+=2)
 	{
 		KV.push_back(k); 
 	}
@@ -956,7 +965,7 @@ cin >> eventID;
                 {
                     cd amp = SI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
                     cd amp3 = cd(0.0); 
-						//AsSI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
+					AsSI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
                     double phi_1 = atan2(ky1_t,kx1_t);
 
 					v0+=real(amp)  ; 
