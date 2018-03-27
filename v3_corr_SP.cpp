@@ -18,10 +18,10 @@ using namespace blitz;
 
 //choice of parameters g^2 \mu = 1
 
-const int size_x=512; // # steps in transverse direction
+const int size_x=512*2; // # steps in transverse direction
 const int N_Y=100; // # steps in long direction
 
-const double L_x=32;// step_x*size_x; // transverse extent
+const double L_x=32*2;// step_x*size_x; // transverse extent
 const double step_x=L_x/size_x; // transvers step size
 
 const double step_x2 = step_x*step_x;
@@ -37,7 +37,7 @@ string eventID;
 boost::normal_distribution<> nd( 0.0, 1.0 / (step_x * sqrt(N_Y) ) );
 boost::variate_generator< RNGType, boost::normal_distribution<> > Gaussian(rng, nd);
 
-double g2mu = 0.5;
+double g2mu = 0.25;
 
 boost::normal_distribution<> nd_p( 0.0, g2mu / (step_x ) );
 boost::variate_generator< RNGType, boost::normal_distribution<> > Gaussian_p(rng, nd_p);
@@ -52,6 +52,9 @@ ofstream fileout;
 
 double A=1.0;
 double B=1.0/A;
+double Rp=0.0;
+
+
 
 int comp_v3=0;
 
@@ -145,7 +148,7 @@ void rho_generator_p(blitz::Array<double,2>& rho)
 {
     double xc = int_to_x(size_x/2);
     double yc = int_to_x(size_x/2);
-    double R = 2.0;
+
 
     for(int i=0; i<size_x; i++)
     {
@@ -154,7 +157,7 @@ void rho_generator_p(blitz::Array<double,2>& rho)
             double x = int_to_x(i);
             double y = int_to_x(j);
 
-            double ellipse = pow((x-xc)/(A*R),2)  + pow((y-yc)/(B*R),2) ;
+            double ellipse = pow((x-xc)/(A*Rp),2)  + pow((y-yc)/(B*Rp),2) ;
 
             rho(i,j) = exp(-ellipse/2.0) * Gaussian_p();
         }
@@ -758,16 +761,24 @@ int main(void)
 	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
 
     cin >> eventID;
-
-	cin >> A;
-	cin >> B;
-    
     cin >> comp_v3;
-    //dname = "v3_data_2018_"+eventID;
+    cin >> g2mu;
+    
+	//dname = "v3_data_2018_"+eventID;
     //mkdir(dname.c_str(),S_IRWXU | S_IRWXG);
 
     //string name = dname+"/MD_" + eventID + ".dat";
     //fileout.open(name.c_str());
+
+	//for(int intLK=1;intLK<4;intLK=intLK+2)
+    int intLK=3;
+    for(int intA=1;intA<4;intA++)
+    for(int intR=1;intR<4;intR++)
+    {
+		string dname; 
+		dname = "dataHBT_g2mu_"+toString(g2mu)+"_a_"+toString(intA)+"_R_"+toString(intR)+"_LK_"+toString(intLK);
+    	mkdir(dname.c_str(),S_IRWXU | S_IRWXG);
+	}
 
     //Target:
     colorArr V_c(size_x,size_x);
@@ -776,6 +787,18 @@ int main(void)
     end = clock();
     elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
     cerr << "target done\n" << "time " << elapsed_secs << flush  << endl;
+
+	for(int intA=1;intA<4;intA++)
+	for(int intR=1;intR<4;intR++)
+	{
+		A=double(intA); 
+		B=1.0/A; 
+		Rp=intR/g2mu; 
+		
+		string dname; 
+		dname = "dataHBT_g2mu_"+toString(g2mu)+"_a_"+toString(intA)+"_R_"+toString(intR)+"_LK_"+toString(intLK);
+		string name = dname+"/v3_" + eventID + ".dat";
+    	fileout.open(name.c_str());
 
     //Projectile:
     //
@@ -799,7 +822,7 @@ int main(void)
 
     //output(0.0, V_c);
 
-    V_c.free();
+    //V_c.free();
     for (int a=0; a<8; a++) A_a.at(a).free();
     cerr << "output done\n" << endl;
 
@@ -841,54 +864,26 @@ int main(void)
 
     double Qs2= pow(Qs(0),2);
 
-   	double dK = 2*step_k;
-    double DK = dK*2;
-    double Kmax = 10+DK;
-	int NK = (Kmax-DK-dK)/DK;  
+   	double dK =intLK*step_k;
 	int nk;
-
 
 
 	vector<double> KV;
 
-	for(double k=0.5; k<6.1;  k+=0.5)
+	for(double k=0.5; k<10;  k+=0.5)
 	{
 		KV.push_back(k); 
 	}
 
-	for(double k=7; k<10;  k+=1)
+/*	for(double k=7; k<10;  k+=1)
+	{
+		KV.push_back(k); 
+	}*/
+
+	for(double k=10; k<17;  k+=1)
 	{
 		KV.push_back(k); 
 	}
-
-	for(double k=10; k<17;  k+=2)
-	{
-		KV.push_back(k); 
-	}
-
-	/*
-	KV.push_back(0.5); 
-	KV.push_back(1); 
-	KV.push_back(1.5); 
-	KV.push_back(2); 
-	KV.push_back(2.5); 
-	KV.push_back(3); 
-	KV.push_back(3.5); 
-	KV.push_back(4); 
-	KV.push_back(4.5); 
-	KV.push_back(5); 
-	KV.push_back(5.5); 
-	KV.push_back(6); 
-	KV.push_back(6.5); 
-	KV.push_back(7); 
-	KV.push_back(8); 
-	KV.push_back(9); 
-	KV.push_back(10); 
-	KV.push_back(11); 
-	KV.push_back(12); 
-	KV.push_back(13); 
-	KV.push_back(14); 
-	KV.push_back(15); */
 
 
   	for(nk=0; nk<KV.size(); nk++)
@@ -980,16 +975,17 @@ int main(void)
                     if(comp_v3==1) amp3 = AsSI(i1, j1, fftOmega_s_c, fftOmega_a_c);
                     double phi_1 = atan2(ky1_t,kx1_t);
 
-					v0+=real(amp)  ; 
-					v1+= amp3  * exp( cd(0.0,1.0) * phi_1) ; 
-					v2+= amp *  exp( cd(0.0,2.0) * phi_1) ; 
-					v3+= amp3 * exp( cd(0.0,3.0) * phi_1) ; 
-					v5+= amp3 * exp( cd(0.0,5.0) * phi_1) ; 
+					v0+= k1*real(amp)  ; 
+					v1+= k1*amp3  * exp( cd(0.0,1.0) * phi_1) ; 
+					v2+= k1*amp *  exp( cd(0.0,2.0) * phi_1) ; 
+					v3+= k1*amp3 * exp( cd(0.0,3.0) * phi_1) ; 
+					v5+= k1*amp3 * exp( cd(0.0,5.0) * phi_1) ; 
 
-					std::cout << (ParallelStream() 
+					/* //Correlation functon part
+                       fileout << (ParallelStream()
      				<< K << " " << phi_1 << " " << real(k1*dK*amp) << " " << real(k1*dK*amp3)
 					<< "\n").toString() << flush;
-									
+					*/
 					N++;
 
 
@@ -1001,7 +997,7 @@ int main(void)
 
      	}
 
-		cout << "# " << K<< " "   
+		fileout << "# " << K<< " "   
 			<< v0 << " " 
 			<< real(v1)/v0 << " " << imag(v1)/v0 << " " 
 			<< real(v2)/v0 << " " << imag(v2)/v0 << " " 
@@ -1014,6 +1010,8 @@ int main(void)
 			std::endl;  
 		
     }
+	fileout.close();
+	}
 }
 
 
@@ -1024,158 +1022,4 @@ int main(void)
 
 
 
-
-
-
-
-
-
-
-
-int main_old(void)
-{
-	clock_t begin = clock();
-	clock_t end = clock();
-	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-
-cin >> eventID;
-
-	cin >> A;
-	cin >> B;
-    dname = "v3_data"+eventID;
-    mkdir(dname.c_str(),S_IRWXU | S_IRWXG);
-
-    string name = dname+"/MD_" + eventID + ".dat";
-    fileout.open(name.c_str());
-
-    //Target:
-    colorArr V_c(size_x,size_x);
-    begin = clock();
-    IC_MV(V_c);
-    end = clock();
-    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-    cerr << "target done\n" << "time " << elapsed_secs << flush  << endl;
-
-    //Projectile:
-    //
-    vector<blitz::Array<double,2> > A_a(8);
-    begin = clock();
-    IC_p(A_a);
-    end = clock();
-    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-    cerr << "projectile done\n" << "time " << elapsed_secs << flush  << endl;
-
-    begin = clock();
-    colorArr Omega_a(size_x,size_x), Omega_s(size_x,size_x);
-    vector<blitz::Array<cd,2> > Omega_a_c(8), Omega_s_c(8);
-    vector<blitz::Array<cd,2> > fftOmega_a_c(8), fftOmega_s_c(8);
-
-    Omega(Omega_s, Omega_a, V_c, A_a);
-    end = clock();
-    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-
-    cerr << "omega done\n" << "time " << elapsed_secs << flush <<  endl;
-
-    //output(0.0, V_c);
-
-    V_c.free();
-    for (int a=0; a<8; a++) A_a.at(a).free();
-    cerr << "output done\n" << endl;
-
-    components(Omega_s, Omega_s_c);
-    components(Omega_a, Omega_a_c);
-
-    Omega_s.free();
-    Omega_a.free();
-    cerr <<  "components done" << "\n";
-
-    begin = clock();
-    for(int a=0; a<8; a++)
-    {
-        cerr <<  "cycle " << a  << "\n";
-        fftOmega_a_c.at(a).resize(size_x,size_x);
-        fftOmega_s_c.at(a).resize(size_x,size_x);
-
-        blitz::Array<cd,2> tmp1(size_x,size_x);
-        blitz::Array<cd,2> tmp2(size_x,size_x);
-
-        tmp1 = Omega_a_c.at(a);
-        FFTW(tmp1,tmp2);
-        fftOmega_a_c.at(a)=tmp2*pow(step_x,2);
-
-        tmp1 = Omega_s_c.at(a);
-        FFTW(tmp1,tmp2);
-        fftOmega_s_c.at(a)=tmp2*pow(step_x,2);
-
-        cerr << fftOmega_a_c.at(a)(0,0) << " " << fftOmega_s_c.at(a)(0,0) << "\n" << flush;
-
-        Omega_s_c.at(a).free();
-        Omega_a_c.at(a).free();
-
-    }
-    end = clock();
-
-    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-    cerr << "components done\n" << "time " << elapsed_secs   << endl << flush;
-
-    double Qs2= pow(Qs(0),2);
-
-   	double dK = 2*step_k;
-    double DK = dK*2;
-    double Kmax = 10+DK;
-	int NK = (Kmax-DK-dK)/DK;  
-	int nk;
-	//#pragma  omp parallel for schedule(static,5)
-    for(nk=0; nk<NK; nk++)
-    {
-		cerr << nk << "\n" << flush;
-		
-		double K = nk*DK+DK+dK; 
-		cerr << K << "\n" << flush;
-		double v0 = 0.0; 
-		cd v1 = cd(0.0,0.0);	
-		cd v2 = cd(0.0,0.0);
-		cd v3 = cd(0.0,0.0);
-		cd v4 = cd(0.0,0.0);
-		cd v5 = cd(0.0,0.0);
-
-        int N=0;
-
-        for(int i1=0; i1<size_x; i1=i1+1)
-        {
-			if( (i1<size_x/4+1)||(i1>3*size_x/4-1) ){
-            double kx1_t  = int_to_k(i1);
-
-            for(int j1=0; j1<size_x; j1=j1+1)
-            {
-				if( (j1<size_x/4+1)||(j1>3*size_x/4-1) )
-				{
-                double ky1_t  = int_to_k(j1);
-                //double k12 =  x2(kx1_t) + x2(ky1_t); //   int_to_k2(i1,j1);
-                double k12 =  int_to_k2(i1,j1);
-
-				double k1 = sqrt(k12); 
-                if( (k1-(K-0.5*dK) ) * ( k1-(K+0.5*dK) )  <0.0 )
-                {
-                    cd amp = SI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
-                    cd amp3 = AsSI(i1, j1, fftOmega_s_c, fftOmega_a_c); 
-                    double phi_1 = atan2(ky1_t,kx1_t);
-
-					std::cout << (ParallelStream() 
-     				<< K << " " << phi_1 << " " << real(k1*dK*amp) << " " << real(k1*dK*amp3)
-					<< "\n").toString() << flush;
-									
-					N++;
-
-
-                 }
-				}
-
-            }
-			}
-
-     	}
-		
-    }
-}
 
